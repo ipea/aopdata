@@ -26,12 +26,12 @@ aopdata_dictionary <- function(lang='en'){
 
   # test server connection
   try( silent = TRUE,
-       check_con <- check_connection('https://ipeagit.github.io/aopdata')
+       check_con <- check_connection('https://ipea.github.io/aopdata')
        )
   if(is.null(check_con) | isFALSE(check_con)){ return(invisible(NULL)) }
 
-  if(lang=='en'){ utils::browseURL("https://ipeagit.github.io/aopdata/articles/data_dic_en.html") }
-  if(lang=='pt'){ utils::browseURL("https://ipeagit.github.io/aopdata/articles/data_dic_pt.html") }
+  if(lang=='en'){ utils::browseURL("https://ipea.github.io/aopdata/articles/data_dic_en.html") }
+  if(lang=='pt'){ utils::browseURL("https://ipea.github.io/aopdata/articles/data_dic_pt.html") }
 
   return(invisible(NULL))
 }

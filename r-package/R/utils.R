@@ -201,7 +201,7 @@ download_data <- function(url, progress_bar = showProgress){
 
   # get backup links
   filenames <- basename(url)
-  url2 <- paste0('https://github.com/ipeaGIT/aopdata/releases/download/v1.0.0/', filenames)
+  url2 <- paste0('https://github.com/ipea/aopdata/releases/download/v1.0.0/', filenames)
 
   # test connection with server1
   try( silent = TRUE, check_con <- check_connection(url[1], silent = TRUE))

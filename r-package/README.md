@@ -3,8 +3,8 @@
 <!-- badges: start -->
 [![CRAN/METACRAN Version](https://www.r-pkg.org/badges/version/aopdata)](https://CRAN.R-project.org/package=aopdata)
 [![CRAN/METACRAN Total downloads](http://cranlogs.r-pkg.org/badges/grand-total/aopdata?color=blue)](https://CRAN.R-project.org/package=aopdata)
-[![Codecov test coverage](https://codecov.io/gh/ipeaGIT/aopdata/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/aopdata?branch=main)
-[![cmd check](https://github.com/ipeaGIT/aopdata/workflows/R-CMD-check/badge.svg)](https://github.com/ipeaGIT/aopdata/actions)
+[![Codecov test coverage](https://codecov.io/gh/ipea/aopdata/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipea/aopdata?branch=main)
+[![cmd check](https://github.com/ipea/aopdata/workflows/R-CMD-check/badge.svg)](https://github.com/ipea/aopdata/actions)
 [![status](https://img.shields.io/badge/status-active-brightgreen.svg)](https://img.shields.io/badge/status-active-brightgreen.svg) 
 <!-- badges: end -->
 
@@ -35,7 +35,7 @@ library(aopdata)
 
 # or use the development version with latest features
 utils::remove.packages('aopdata')
-devtools::install_github("ipeaGIT/aopdata", subdir = "r-package")
+devtools::install_github("ipea/aopdata", subdir = "r-package")
 library(aopdata)
 ```
 
@@ -50,10 +50,10 @@ The **aopdata** package includes five core functions.
 
 For a detailed explanations of these functions, check the **vignettes**:
 
-- [Mapping urban accessibility](https://ipeagit.github.io/aopdata/articles/access_maps.html)
-- [Mapping population data](https://ipeagit.github.io/aopdata/articles/population_maps.html)
-- [Mapping land use data](https://ipeagit.github.io/aopdata/articles/landuse_maps.html)
-- [Analyzing inequality in access to opportunities](https://ipeagit.github.io/aopdata/articles/access_inequality.html)
+- [Mapping urban accessibility](https://ipea.github.io/aopdata/articles/access_maps.html)
+- [Mapping population data](https://ipea.github.io/aopdata/articles/population_maps.html)
+- [Mapping land use data](https://ipea.github.io/aopdata/articles/landuse_maps.html)
+- [Analyzing inequality in access to opportunities](https://ipea.github.io/aopdata/articles/access_inequality.html)
 
 
 ## Basic Usage
@@ -145,7 +145,7 @@ all <- read_landuse(city = 'all', year = 2019)
 
 ```
 
-# Acknowledgement <img align="right" src="https://github.com/ipeaGIT/aopdata/blob/main/r-package/man/figures/ipea_logo.png?raw=true" alt="ipea" width="300">
+# Acknowledgement <img align="right" src="https://github.com/ipea/aopdata/blob/main/r-package/man/figures/ipea_logo.png?raw=true" alt="ipea" width="300">
 
 The R package **aopdata** is developed by a team at the Institute for Applied Economic Research (Ipea), Brazil.
 

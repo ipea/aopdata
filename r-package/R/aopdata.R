@@ -8,7 +8,7 @@
 #' the project. More  info on the AOP website <https://www.ipea.gov.br/acessooportunidades/en/>.
 #'
 #' @section Usage:
-#' Please check the vignettes on the [website](https://ipeagit.github.io/aopdata/).
+#' Please check the vignettes on the [website](https://ipea.github.io/aopdata/).
 #'
 #' @docType package
 #' @name aopdata

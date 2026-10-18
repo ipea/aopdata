@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
   eval = identical(tolower(Sys.getenv("NOT_CRAN")), "true"),
   out.width = "100%"
 )
+
+# data is downloaded only when NOT_CRAN is true
+df <- NULL
 ```
 
 
@@ -33,7 +36,7 @@ library(units)
 
 ## Download accessibility data
 
-```{r, message = FALSE, eval = TRUE}
+```{r, message = FALSE}
 df <- aopdata::read_access(
   city = 'Curitiba',
   mode = 'public_transport',

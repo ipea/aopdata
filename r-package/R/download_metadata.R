@@ -16,7 +16,7 @@ download_metadata <- function(){ # nocov start
   } else {
 
     # test server connection with github
-    metadata_link <- 'https://github.com/ipeaGIT/aopdata/releases/download/v1.0.0/metadata.csv'
+    metadata_link <- 'https://github.com/ipea/aopdata/releases/download/v1.0.0/metadata.csv'
     try( silent = TRUE,
          check_con <- check_connection(metadata_link, silent = TRUE)
          )

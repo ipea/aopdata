@@ -1,12 +1,11 @@
 ^aopdata\.Rproj$
 ^\.Rproj\.user$
 ^prep_data$
-^tests_rafa
+^tests/tests_rafa$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^codecov\.yml$
 ^doc$
 ^Meta$
-^papers$
 ^cran-comments\.md$

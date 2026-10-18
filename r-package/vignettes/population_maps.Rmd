@@ -17,6 +17,9 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+
+# data is downloaded only when NOT_CRAN is true
+df <- NULL
 ```
 
 Here are a few quick examples to illustrate how you can use the {aopdata} package
@@ -34,7 +37,7 @@ library(scales)
 ```
 
 ## Download population data
-```{r, message = TRUE, eval = TRUE}
+```{r, message = TRUE}
 df <- aopdata::read_population(
   city = 'Fortaleza',
   year = 2010,

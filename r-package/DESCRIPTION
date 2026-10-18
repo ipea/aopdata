@@ -17,8 +17,8 @@ Description: Download data from the 'Access to Opportunities Project (AOP)'. The
              health care, schools and social assistance facilities at a fine 
              spatial resolution for all cities included in the project. More 
              info on the 'AOP' website <https://www.ipea.gov.br/acessooportunidades/en/>.
-URL: https://ipeagit.github.io/aopdata/, https://github.com/ipeaGIT/aopdata
-BugReports: https://github.com/ipeaGIT/aopdata/issues
+URL: https://ipea.github.io/aopdata/, https://github.com/ipea/aopdata
+BugReports: https://github.com/ipea/aopdata/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:

@@ -82,7 +82,7 @@
 
 **Minor changes**
 
-- `read_` functions now have no default value for the `city` parameter. [Closes #38](https://github.com/ipeaGIT/aopdata/issues/38).
+- `read_` functions now have no default value for the `city` parameter. [Closes #38](https://github.com/ipea/aopdata/issues/38).
 - Fixed `ERROR` message when there is no data for a particular transport mode for an specific city & year.
 
 

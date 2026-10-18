@@ -4,9 +4,9 @@
 Opportunities Project* (AOP): accessibility estimates by transport mode,
 population/socioeconomic data and land use (jobs, schools, health, CRAS), all
 aggregated on an H3 hexagonal grid (resolution 9) for the 20 largest Brazilian
-cities, years 2017–2019. Published on CRAN; developed by Ipea (ipeaGIT).
+cities, years 2017–2019. Published on CRAN; developed by Ipea (ipea).
 Maintainer: Rafael H. M. Pereira. License MIT. Docs:
-<https://ipeagit.github.io/aopdata/>.
+<https://ipea.github.io/aopdata/>.
 
 **The package lives in the `r-package/` subfolder**, not at the repo root. Run
 R tooling against `"r-package"` (or from inside it); git commands run from the

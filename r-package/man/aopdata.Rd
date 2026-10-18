@@ -15,15 +15,15 @@ the project. More  info on the AOP website \url{https://www.ipea.gov.br/acessoop
 }
 \section{Usage}{
 
-Please check the vignettes on the \href{https://ipeagit.github.io/aopdata/}{website}.
+Please check the vignettes on the \href{https://ipea.github.io/aopdata/}{website}.
 }
 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://ipeagit.github.io/aopdata/}
-  \item \url{https://github.com/ipeaGIT/aopdata}
-  \item Report bugs at \url{https://github.com/ipeaGIT/aopdata/issues}
+  \item \url{https://ipea.github.io/aopdata/}
+  \item \url{https://github.com/ipea/aopdata}
+  \item Report bugs at \url{https://github.com/ipea/aopdata/issues}
 }
 
 }
