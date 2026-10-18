@@ -23,6 +23,7 @@ Opens aopdata data dictionary on a web browser
 ## Examples
 
 ``` r
+
 # Data dictionary in English
 aopdata_dictionary(lang='en')
 

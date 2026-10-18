@@ -23,7 +23,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/ipeaGIT/aopdata/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/ipea/aopdata/blob/main/inst/CITATION)
 
 Pereira, Rafael H. M. et al. (2022) Estimativas de acessibilidade a
 empregos e serviços públicos via transporte ativo, público e privado nas

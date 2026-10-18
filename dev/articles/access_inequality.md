@@ -3,6 +3,7 @@
 Social and racial inequalities in access to opportunities
 
 ``` r
+
 # load libraries
 library(aopdata)
 library(sf)
@@ -14,6 +15,7 @@ library(units)
 ## Download accessibility data
 
 ``` r
+
 df <- aopdata::read_access(
   city = 'Curitiba',
   mode = 'public_transport',
@@ -26,6 +28,7 @@ df <- aopdata::read_access(
 ## Inequality in access to job opportunities by income decile
 
 ``` r
+
 ggplot() +
   geom_boxplot(data=subset(df, !is.na(R003)),
                aes(x = factor(R003), y=CMATT60/1000, color=factor(R003))) +
@@ -42,6 +45,7 @@ ggplot() +
 ## Palma ratio
 
 ``` r
+
 # average access of the wealthiest 10%
 avg_access_10p_wealthiest <- df[ R003==10, weighted.mean(x=CMATT60, w=P001, na.rm=T)]
 
@@ -61,6 +65,7 @@ poorest people in less than 60 min.
 ## Inequality in travel time to closes hospital
 
 ``` r
+
 # replace Inf travel time with 120
 df[, TMISA := fifelse(TMISA==Inf, 120, TMISA)]
 

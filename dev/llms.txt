@@ -24,13 +24,14 @@ website](https://www.ipea.gov.br/acessooportunidades/en/).
 ## Installation
 
 ``` r
+
 # From CRAN
 install.packages("aopdata")
 library(aopdata)
 
 # or use the development version with latest features
 utils::remove.packages('aopdata')
-devtools::install_github("ipeaGIT/aopdata", subdir = "r-package")
+devtools::install_github("ipea/aopdata", subdir = "r-package")
 library(aopdata)
 ```
 
@@ -38,27 +39,27 @@ library(aopdata)
 
 The **aopdata** package includes five core functions.
 
-- [`read_population()`](https://ipeagit.github.io/aopdata/dev/reference/read_population.md) -
+- [`read_population()`](https://ipea.github.io/aopdata/dev/reference/read_population.md) -
   Download population data
-- [`read_landuse()`](https://ipeagit.github.io/aopdata/dev/reference/read_landuse.md) -
+- [`read_landuse()`](https://ipea.github.io/aopdata/dev/reference/read_landuse.md) -
   Download landuse data
-- [`read_access()`](https://ipeagit.github.io/aopdata/dev/reference/read_access.md) -
+- [`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md) -
   Download accessibility estimates
-- [`aopdata_dictionary()`](https://ipeagit.github.io/aopdata/dev/reference/aopdata_dictionary.md) -
+- [`aopdata_dictionary()`](https://ipea.github.io/aopdata/dev/reference/aopdata_dictionary.md) -
   Opens aopdata data dictionary on a web browser
-- [`read_grid()`](https://ipeagit.github.io/aopdata/dev/reference/read_grid.md) -
+- [`read_grid()`](https://ipea.github.io/aopdata/dev/reference/read_grid.md) -
   Download the H3 hexagonal spatial grid
 
 For a detailed explanations of these functions, check the **vignettes**:
 
 - [Mapping urban
-  accessibility](https://ipeagit.github.io/aopdata/articles/access_maps.html)
+  accessibility](https://ipea.github.io/aopdata/articles/access_maps.html)
 - [Mapping population
-  data](https://ipeagit.github.io/aopdata/articles/population_maps.html)
+  data](https://ipea.github.io/aopdata/articles/population_maps.html)
 - [Mapping land use
-  data](https://ipeagit.github.io/aopdata/articles/landuse_maps.html)
+  data](https://ipea.github.io/aopdata/articles/landuse_maps.html)
 - [Analyzing inequality in access to
-  opportunities](https://ipeagit.github.io/aopdata/articles/access_inequality.html)
+  opportunities](https://ipea.github.io/aopdata/articles/access_inequality.html)
 
 ## Basic Usage
 
@@ -77,7 +78,7 @@ browser by running:
 ### Accessibility estimates
 
 The
-[`read_access()`](https://ipeagit.github.io/aopdata/dev/reference/read_access.md)
+[`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md)
 function downloads accessibility estimates for a given `city`, `mode`
 and `year`. For the sake of convenience, this function will also
 automatically download the population and land use data for the cities
@@ -130,7 +131,7 @@ downloaded for 2017, 2018 or 2019.
 
 In case you would like to download only the H3 spatial grid of cities in
 the AOP project, you can use the
-[`read_grid()`](https://ipeagit.github.io/aopdata/dev/reference/read_grid.md)
+[`read_grid()`](https://ipea.github.io/aopdata/dev/reference/read_grid.md)
 function.
 
     h3_for <- read_grid(city = 'Fortaleza')
@@ -183,15 +184,15 @@ publications below:
 
 ## All functions
 
-- [`aopdata_dictionary()`](https://ipeagit.github.io/aopdata/dev/reference/aopdata_dictionary.md)
+- [`aopdata_dictionary()`](https://ipea.github.io/aopdata/dev/reference/aopdata_dictionary.md)
   : aopdata data dictionary
-- [`read_access()`](https://ipeagit.github.io/aopdata/dev/reference/read_access.md)
+- [`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md)
   : Download accessibility estimates with population and land use data
-- [`read_grid()`](https://ipeagit.github.io/aopdata/dev/reference/read_grid.md)
+- [`read_grid()`](https://ipea.github.io/aopdata/dev/reference/read_grid.md)
   : Download spatial hexagonal grid H3
-- [`read_landuse()`](https://ipeagit.github.io/aopdata/dev/reference/read_landuse.md)
+- [`read_landuse()`](https://ipea.github.io/aopdata/dev/reference/read_landuse.md)
   : Download land use and population data
-- [`read_population()`](https://ipeagit.github.io/aopdata/dev/reference/read_population.md)
+- [`read_population()`](https://ipea.github.io/aopdata/dev/reference/read_population.md)
   : Download population and socioeconomic data
 
 # Articles
@@ -199,16 +200,16 @@ publications below:
 ### All vignettes
 
 - [Analyzing inequality in access to
-  opportunities](https://ipeagit.github.io/aopdata/dev/articles/access_inequality.md):
+  opportunities](https://ipea.github.io/aopdata/dev/articles/access_inequality.md):
 - [Mapping urban
-  accessibility](https://ipeagit.github.io/aopdata/dev/articles/access_maps.md):
+  accessibility](https://ipea.github.io/aopdata/dev/articles/access_maps.md):
 - [Introduction to
-  aopdata](https://ipeagit.github.io/aopdata/dev/articles/aopdata.md):
+  aopdata](https://ipea.github.io/aopdata/dev/articles/aopdata.md):
 - [Data dictionary
-  \[EN\]](https://ipeagit.github.io/aopdata/dev/articles/data_dic_en.md):
+  \[EN\]](https://ipea.github.io/aopdata/dev/articles/data_dic_en.md):
 - [Dicionário de dados
-  \[PT\]](https://ipeagit.github.io/aopdata/dev/articles/data_dic_pt.md):
+  \[PT\]](https://ipea.github.io/aopdata/dev/articles/data_dic_pt.md):
 - [Mapping land use
-  data](https://ipeagit.github.io/aopdata/dev/articles/landuse_maps.md):
+  data](https://ipea.github.io/aopdata/dev/articles/landuse_maps.md):
 - [Mapping population
-  data](https://ipeagit.github.io/aopdata/dev/articles/population_maps.md):
+  data](https://ipea.github.io/aopdata/dev/articles/population_maps.md):

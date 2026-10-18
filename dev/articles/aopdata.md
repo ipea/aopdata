@@ -29,45 +29,47 @@ You can install `aopdata` from CRAN, or the development version from
 GitHub.
 
 ``` r
+
 # CRAN
 install.packages("aopdata")
 
 # dev version from github
 utils::remove.packages('aopdata')
-devtools::install_github("ipeaGIT/aopdata", subdir = "r-package")
+devtools::install_github("ipea/aopdata", subdir = "r-package")
 ```
 
 ### Overview of the package
 
 The **aopdata** package includes five core functions.
 
-- [`read_population()`](https://ipeagit.github.io/aopdata/dev/reference/read_population.md) -
+- [`read_population()`](https://ipea.github.io/aopdata/dev/reference/read_population.md) -
   Download population data
-- [`read_landuse()`](https://ipeagit.github.io/aopdata/dev/reference/read_landuse.md) -
+- [`read_landuse()`](https://ipea.github.io/aopdata/dev/reference/read_landuse.md) -
   Download landuse data
-- [`read_access()`](https://ipeagit.github.io/aopdata/dev/reference/read_access.md) -
+- [`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md) -
   Download accessibility estimates
-- [`aopdata_dictionary()`](https://ipeagit.github.io/aopdata/dev/reference/aopdata_dictionary.md) -
+- [`aopdata_dictionary()`](https://ipea.github.io/aopdata/dev/reference/aopdata_dictionary.md) -
   Opens aopdata data dictionary on a web browser
-- [`read_grid()`](https://ipeagit.github.io/aopdata/dev/reference/read_grid.md) -
+- [`read_grid()`](https://ipea.github.io/aopdata/dev/reference/read_grid.md) -
   Download the H3 hexagonal spatial grid
 
 For a detailed explanations of these functions, check the **vignettes**:
 
 - [Mapping urban
-  accessibility](https://ipeagit.github.io/aopdata/dev/articles/access_maps.md)
+  accessibility](https://ipea.github.io/aopdata/dev/articles/access_maps.md)
 - [Mapping population
-  data](https://ipeagit.github.io/aopdata/dev/articles/population_maps.md)
+  data](https://ipea.github.io/aopdata/dev/articles/population_maps.md)
 - [Mapping land use
-  data](https://ipeagit.github.io/aopdata/dev/articles/landuse_maps.md)
+  data](https://ipea.github.io/aopdata/dev/articles/landuse_maps.md)
 - [Analyzing inequality in access to
-  opportunities](https://ipeagit.github.io/aopdata/dev/articles/access_inequality.md)
+  opportunities](https://ipea.github.io/aopdata/dev/articles/access_inequality.md)
 
 ### Basic Usage
 
 First, you need to load the package.
 
 ``` r
+
 library(aopdata)
 ```
 
@@ -78,6 +80,7 @@ function. However, you can also open the data dictionary on a web
 browser by running:
 
 ``` r
+
 # for English
 aopdata_dictionary(lang = 'en')
 
@@ -88,7 +91,7 @@ aopdata_dictionary(lang = 'pt')
 #### Accessibility estimates
 
 The
-[`read_access()`](https://ipeagit.github.io/aopdata/dev/reference/read_access.md)
+[`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md)
 function downloads accessibility estimates for a given `city`, `mode`
 and `year`. For the sake of convenience, this function will also
 automatically download the population and land use data for the cities
@@ -96,6 +99,7 @@ selected. Note that accessibility estimates are available for peak and
 off-peak periods for `public_transport`and `car` modes.
 
 ``` r
+
 # Download accessibility, population and land use data
 df <- aopdata::read_access(
   city = 'Curitiba', 
@@ -110,6 +114,7 @@ You many also set the parameter `geometry = TRUE` so that functions
 return a spatial `sf` object with the geometries of the H3 spatial grid.
 
 ``` r
+
 # Download accessibility, population and land use data
 df <- aopdata::read_access(
   city = 'Curitiba', 
@@ -129,6 +134,7 @@ comes from the latest Brazilian 2010 census, while land use data cna be
 downloaded for 2017, 2018 or 2019.
 
 ``` r
+
 # Land use data
 df <- aopdata::read_landuse(
   city = 'Fortaleza', 
@@ -150,10 +156,11 @@ df <- aopdata::read_population(
 
 In case you would like to download only the H3 spatial grid of cities in
 the AOP project, you can use the
-[`read_grid()`](https://ipeagit.github.io/aopdata/dev/reference/read_grid.md)
+[`read_grid()`](https://ipea.github.io/aopdata/dev/reference/read_grid.md)
 function.
 
 ``` r
+
 h3 <- aopdata::read_grid(city = 'Fortaleza', showProgress = FALSE)
 ```
 
@@ -164,6 +171,7 @@ In all of the functions above, note that:
 - The `city` parameter can also be a 3-letter abbreviation of the city.
 
 ``` r
+
 df <- aopdata::read_access(
   city = 'cur', 
   mode = 'public_transport', 
@@ -179,6 +187,7 @@ df <- aopdata::read_grid(city = 'for', showProgress = FALSE)
   using `city = 'all'`:
 
 ``` r
+
 df <- aopdata::read_landuse(city = 'all', year = 2019)
 ```
 
