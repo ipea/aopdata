@@ -22,7 +22,7 @@ test_that("read_landuse errors and messages", {
   testthat::expect_error(read_landuse(city = 'abc'))
 
   # Wrong year
-  testthat::expect_error(read_landuse(city = 'rec', year=1500))
+  testthat::expect_error(read_landuse(city = 'rec', year=1500), class = "aopdata_error")
 
   # Wrong geometry or showProgress
   testthat::expect_error(read_landuse(city = 'rec', year=2019, geometry = 'aaa'))

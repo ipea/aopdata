@@ -19,6 +19,7 @@ select_city_input <- function(temp_meta=temp_meta, city=NULL){
   if( !is.character(city) | any(nchar(city)<3) ){
     cli::cli_abort(
       message = error_msg,
+      class = "aopdata_error",
       call = rlang::caller_env()
     )
   }
@@ -38,6 +39,7 @@ select_city_input <- function(temp_meta=temp_meta, city=NULL){
       else {
         cli::cli_abort(
           message = error_msg,
+          class = "aopdata_error",
           call = rlang::caller_env()
         )
         }
@@ -60,6 +62,7 @@ select_city_input <- function(temp_meta=temp_meta, city=NULL){
     else {
       cli::cli_abort(
         message = error_msg,
+        class = "aopdata_error",
         call = rlang::caller_env()
       )
       }
@@ -81,7 +84,10 @@ select_city_input <- function(temp_meta=temp_meta, city=NULL){
 #'
 select_year_input <- function(temp_meta=temp_meta, year=NULL){
 
-  checkmate::assert_numeric(year, finite = TRUE, any.missing = FALSE)
+  abort_if_invalid(
+    checkmate::check_numeric(year, finite = TRUE, any.missing = FALSE),
+    "year"
+  )
 
   years_available <- paste(unique(temp_meta$year),collapse = " ")
 
@@ -94,6 +100,7 @@ select_year_input <- function(temp_meta=temp_meta, year=NULL){
   # invalid input
     cli::cli_abort(
       message = "Data currently available only for the years {years_available}.",
+      class = "aopdata_error",
       call = rlang::caller_env()
     )
 
@@ -114,21 +121,25 @@ select_year_input <- function(temp_meta=temp_meta, year=NULL){
 #'
 select_mode_input <- function(temp_meta=temp_meta, mode=NULL){
 
-  checkmate::assert_string(mode, null.ok = FALSE)
+  abort_if_invalid(checkmate::check_string(mode, null.ok = FALSE), "mode")
 
   # Valid input
   if (mode %in% temp_meta$mode) {
-    message(paste0("Using mode ", mode))
     temp_meta <- temp_meta[ temp_meta$mode %in% mode, ]
     return(temp_meta)
     }
 
   # invalid input
-  error_msg <- paste0("Error: This 'mode' is not available for this 'city' & 'year'. Please try another 'year' or one of the following modes: ",
-                      paste(unique(temp_meta$mode), collapse = " "))
+  modes_available <- unique(temp_meta$mode)
+  error_msg <- paste(
+    "This {.arg mode} is not available for this {.arg city} and {.arg year}.",
+    "Please try another {.arg year} or one of the following modes:",
+    "{.val {modes_available}}."
+  )
   # invalid input
   cli::cli_abort(
     message = error_msg,
+    class = "aopdata_error",
     call = rlang::caller_env()
   )
 
@@ -196,7 +207,10 @@ download_data <- function(url, progress_bar = showProgress){
 
   # check showProgress input
   if (!(progress_bar %in% c(TRUE, FALSE))) {
-    cli::cli_abort("Value to argument 'showProgress' has to be either TRUE or FALSE")
+    cli::cli_abort(
+      "{.arg showProgress} must be TRUE or FALSE.",
+      class = "aopdata_error"
+    )
     }
 
   # get backup links
@@ -229,7 +243,7 @@ download_data <- function(url, progress_bar = showProgress){
   # if anything fails, return NULL
   if (any(!downloaded_files$success | is.na(downloaded_files$success))) {
     msg <- "File cached locally seems to be corrupted. Please download it again."
-    cli::cli_alert_danger(msg)
+    inform_failure(msg)
     return(invisible(NULL))
   }
 
@@ -283,7 +297,7 @@ load_data <- function(temps=NULL){
   # check if data was read Ok
   if (nrow(temp)==0) {
     msg <- "A file must have been corrupted during download. Please restart your R session and download the data again."
-    cli::cli_alert_danger(msg)
+    inform_failure(msg)
     return(invisible(NULL))
   }
 
@@ -375,7 +389,7 @@ check_connection <- function(url = 'https://www.ipea.gov.br/geobr/aopdata/metada
   # Check if user has internet connection
   if (!curl::has_internet()) {
     if (isFALSE(silent)) {
-      cli::cli_alert_danger("No internet connection.")
+      inform_failure("No internet connection.")
     }
     return(FALSE)
   }
@@ -390,7 +404,7 @@ check_connection <- function(url = 'https://www.ipea.gov.br/geobr/aopdata/metada
   # Check if there was an error during the fetch attempt
   if (inherits(response, "try-error")) {
     if (isFALSE(silent)) {
-      cli::cli_alert_danger(msg)
+      inform_failure(msg)
     }
     return(FALSE)
   }
@@ -406,7 +420,7 @@ check_connection <- function(url = 'https://www.ipea.gov.br/geobr/aopdata/metada
   # Link not working or timeout
   if (status_code != 200L) {
     if (isFALSE(silent)) {
-      cli::cli_alert_danger(msg)
+      inform_failure(msg)
     }
     return(FALSE)
   }
@@ -426,8 +440,44 @@ check_connection <- function(url = 'https://www.ipea.gov.br/geobr/aopdata/metada
 check_downloaded_obj <- function(obj){
 
   if (is.null(obj)) {
-    cli::cli_alert_danger("No internet connection.")
+    inform_failure("No internet connection.")
     return(invisible(NULL))
     }
 }
 
+
+
+
+#' Throw an aopdata error when a checkmate check fails
+#'
+#' @param check Result of a `checkmate::check_*()` call: `TRUE` or a string.
+#' @param arg Name of the argument being checked.
+#' @param call Environment of the call shown in the error.
+#'
+#' @return `invisible(TRUE)`, or an error of class `aopdata_error`.
+#' @keywords internal
+#'
+abort_if_invalid <- function(check, arg, call = rlang::caller_env()) {
+  if (!isTRUE(check)) {
+    cli::cli_abort(
+      c("Invalid {.arg {arg}} argument.", "x" = "{check}"),
+      class = "aopdata_error",
+      call = call
+    )
+  }
+  invisible(TRUE)
+}
+
+
+
+
+#' Inform the user that a download failed
+#'
+#' @param msg The message text.
+#'
+#' @return Signals a message of class `aopdata_network`.
+#' @keywords internal
+#'
+inform_failure <- function(msg) {
+  cli::cli_inform(c("x" = "{msg}"), class = "aopdata_network")
+}

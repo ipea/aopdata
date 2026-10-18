@@ -20,14 +20,14 @@ test_that("read_grid errors and messages", {
 
   # Wrong city
   testthat::expect_error(read_grid(city = 'abcdefg'))
-  testthat::expect_error(read_grid(city = 'abc'))
+  testthat::expect_error(read_grid(city = 'abc'), class = "aopdata_error")
   testthat::expect_error(read_grid(city = 'a'))
   testthat::expect_error(read_grid(city = 1))
   testthat::expect_error(read_grid(city = NULL))
   testthat::expect_error(read_grid())
 
   # Wrong geometry or showProgress
-  testthat::expect_error( read_grid(city = 'rec', showProgress = 'aaa'))
+  testthat::expect_error( read_grid(city = 'rec', showProgress = 'aaa'), class = "aopdata_error")
   testthat::expect_error( read_grid(city = 'rec', showProgress = 333))
   testthat::expect_error( read_grid(city = 'rec', showProgress = NULL))
 

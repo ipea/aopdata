@@ -62,8 +62,8 @@ test_that("read_access errors and messages", {
 
    # Wrong mode
    testthat::expect_error( read_access(city='natal', mode= 'public_transport', geometry = FALSE, showProgress = FALSE) )
-   testthat::expect_error( read_access(city=c('nat', 'poa'), mode= 'public_transport', geometry = FALSE, showProgress = FALSE) )
-   testthat::expect_error( read_access(city='nat', mode= 'public_transport', geometry = FALSE, showProgress = FALSE) )
+   testthat::expect_error( read_access(city=c('nat', 'poa'), mode= 'public_transport', geometry = FALSE, showProgress = FALSE), class = "aopdata_error")
+   testthat::expect_error( read_access(city='nat', mode= 'public_transport', geometry = FALSE, showProgress = FALSE), class = "aopdata_error")
    testthat::expect_error( read_access(city='nat', mode= 'public_transport', geometry = FALSE, showProgress = FALSE, year=2018) )
    testthat::expect_error( read_access(city='nat', mode= 'public_transport', geometry = FALSE, showProgress = FALSE, year=2017) )
 

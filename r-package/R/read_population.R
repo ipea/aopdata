@@ -91,7 +91,7 @@ read_population <- function(city = NULL,
                             showProgress = TRUE){
 
   # checks
-  checkmate::assert_logical(geometry)
+  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t='population',
@@ -102,7 +102,9 @@ read_population <- function(city = NULL,
   check_downloaded_obj(temp_meta) # nocov
   if (is.null(temp_meta)) { return(invisible(NULL)) }
 
-  message(paste0("Downloading population data for the year ", year))
+  if (isTRUE(showProgress)) {
+    cli::cli_inform("Downloading population data for the year {year}")
+  }
 
   # list paths of files to download
   file_url <- as.character(temp_meta$download_path2)

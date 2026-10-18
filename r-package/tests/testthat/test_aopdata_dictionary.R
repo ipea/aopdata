@@ -17,7 +17,7 @@ test_that("aopdata_dictionary", {
 # Expected errors -----------------------------------
 test_that("aopdata_dictionary", {
 
-  testthat::expect_error(aopdata_dictionary(lang='999') )
+  testthat::expect_error(aopdata_dictionary(lang='999'), class = "aopdata_error")
   testthat::expect_error(aopdata_dictionary(lang=999) )
 
 })

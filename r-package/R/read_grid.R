@@ -57,7 +57,7 @@ read_grid <- function(city = NULL,
                       showProgress = FALSE){
 
   # checks
-  checkmate::assert_logical(showProgress)
+  abort_if_invalid(checkmate::check_logical(showProgress), "showProgress")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t="grid", c=city)

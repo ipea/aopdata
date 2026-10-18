@@ -33,6 +33,15 @@ testthat::test_that("check connection", {
 
   # check_downloaded_obj
   testthat::expect_null( check_downloaded_obj(NULL) )
-  testthat::expect_message( check_downloaded_obj(NULL) )
+  testthat::expect_message( check_downloaded_obj(NULL), class = "aopdata_network")
 
+})
+
+
+### checkmate text with braces ----------------
+
+testthat::test_that("abort_if_invalid handles braces in checkmate messages", {
+  check <- checkmate::check_choice("x", c("{a}", "b"))
+  testthat::expect_error(abort_if_invalid(check, "x"), class = "aopdata_error")
+  testthat::expect_true(abort_if_invalid(TRUE, "x"))
 })

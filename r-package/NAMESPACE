@@ -5,10 +5,14 @@ export(read_access)
 export(read_grid)
 export(read_landuse)
 export(read_population)
-importFrom(data.table,"%like%")
-importFrom(data.table,":=")
-importFrom(data.table,setDT)
+importFrom(data.table,
+  "%like%",
+  ":=",
+  setDT
+)
 importFrom(methods,is)
-importFrom(utils,globalVariables)
-importFrom(utils,head)
-importFrom(utils,tail)
+importFrom(utils,
+  globalVariables,
+  head,
+  tail
+)

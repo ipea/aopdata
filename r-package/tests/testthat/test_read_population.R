@@ -26,7 +26,7 @@ test_that("read_population errors and messages", {
 
   # Wrong geometry or showProgress
   testthat::expect_error(read_population(city = 'rec', year=2010, geometry = 'aaa'))
-  testthat::expect_error(read_population(city = 'rec', year=2010, showProgress = 'aaa'))
+  testthat::expect_error(read_population(city = 'rec', year=2010, showProgress = 'aaa'), class = "aopdata_error")
 
 })
 
@@ -63,4 +63,23 @@ testthat::test_that("gracefully fail if could not download grid data", {
   )
   testthat::expect_null( read_population(city='nat', geometry = TRUE) )
   testthat::expect_message( read_population(city='nat', geometry = TRUE) )
+})
+
+
+### progress messages ----------------
+
+testthat::test_that("progress messages follow showProgress", {
+
+  testthat::local_mocked_bindings(
+    select_metadata = function(...) { data.frame(download_path2 = "x", year = 2010) },
+    download_data = function(...) { NULL }
+  )
+  testthat::expect_message(
+    read_population(city = 'nat', showProgress = TRUE),
+    "Downloading population data"
+  )
+  testthat::expect_no_message(
+    read_population(city = 'nat', showProgress = FALSE),
+    message = "Downloading"
+  )
 })

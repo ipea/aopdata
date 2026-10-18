@@ -53,7 +53,7 @@ read_something <- function(city = NULL, year = 2019, geometry = FALSE,
                            showProgress = TRUE) {
 
   # checks
-  checkmate::assert_logical(geometry)
+  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t = 'something', c = city, y = year)
@@ -78,7 +78,8 @@ read_something <- function(city = NULL, year = 2019, geometry = FALSE,
 - **Inputs:** `city`, `year`, `mode` are validated by `select_city_input()`,
   `select_year_input()`, `select_mode_input()` in `R/utils.R` against the
   metadata, which is the source of truth for what exists. Other arguments use
-  `checkmate::assert_*`. City input accepts names or 3-letter abbreviations,
+  `abort_if_invalid(checkmate::check_*(...), "<arg>")` (`R/utils.R`), never
+  bare `checkmate::assert_*`. City input accepts names or 3-letter abbreviations,
   case- and accent-insensitive (`tolower()` + `iconv(to = "ASCII//TRANSLIT")`),
   and `"all"`.
 - **Composition:** `read_access()` calls `read_landuse()`, which calls
@@ -92,8 +93,9 @@ read_something <- function(city = NULL, year = 2019, geometry = FALSE,
 This is the package's most important invariant.
 
 - Network failures **never raise an error**. They print a `cli` alert
-  (`cli::cli_alert_danger()`) and return `invisible(NULL)`. Input errors (bad
-  city/year/mode, wrong type) do raise, with `cli::cli_abort()`.
+  with `inform_failure(msg)` (class `aopdata_network`) and return
+  `invisible(NULL)`. Input errors (bad city/year/mode, wrong type) do raise,
+  with `cli::cli_abort(..., class = "aopdata_error")`.
 - **Every call site** that receives the result of `select_metadata()`,
   `download_data()` or another reader checks `is.null()` and returns
   `invisible(NULL)` immediately. A missing check turns a graceful failure into
@@ -125,13 +127,17 @@ This is the package's most important invariant.
 
 ## A5. Messages and errors (cli)
 
-- Errors: `cli::cli_abort()` with glue interpolation (`"... in {year} are:
-  {cities_available}."`). Network problems: `cli::cli_alert_danger()`.
-- Legacy: `message(paste0("Downloading ... for the year ", year))` in the
-  readers. **[NEW]** new or modified progress messages use
-  `cli::cli_inform()` / `cli::cli_progress_*`, and respect `showProgress`
-  where relevant. Migrating the existing `message()` calls is its own planned
-  step, never a drive-by.
+- Every condition goes through cli (migrated 2026-10-18; no `message()`,
+  `warning()`, `stop()` or `cli_alert_*` in `R/`).
+- Errors: `cli::cli_abort(..., class = "aopdata_error")` with glue
+  interpolation (`"... in {year} are: {cities_available}."`). Argument-type
+  checks: `abort_if_invalid(checkmate::check_*(...), "<arg>")`.
+- Network/download failures: `inform_failure(msg)` (a `cli_inform()` message of
+  class `aopdata_network`).
+- Progress: `if (isTRUE(showProgress)) cli::cli_inform("Downloading ...")`,
+  no class.
+- Text that may contain braces (checkmate output, user values) goes in as a
+  substituted value, `"{x}"`, never as the template itself.
 
 ## A6. Style
 
@@ -224,7 +230,7 @@ Version headers are `# aopdata vX.Y.Z`. Sections are bold lines, not `##`:
 |---|---|
 | `library()`/`require()` in `R/` | `pkg::fun()` |
 | Writing outside `tempdir()` | Write only to `tempdir()` or user-supplied paths |
-| `stop()` / uncaught error on a network failure | `cli::cli_alert_danger()` + `return(invisible(NULL))` |
+| `stop()` / uncaught error on a network failure | `inform_failure()` + `return(invisible(NULL))` |
 | Reader result used without `is.null()` check | `check_downloaded_obj()` + early return |
 | A single hardcoded server URL | Ipea + GitHub-release mirrors (A3) |
 | Example/test/vignette downloading on CRAN | `@examplesIf NOT_CRAN`, `skip_on_cran()`, `eval = NOT_CRAN` |

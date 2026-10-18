@@ -1,3 +1,10 @@
+# aopdata (development version)
+
+**Minor changes**
+
+- All messages and errors now use {cli}. Errors have the condition class `aopdata_error`, and messages about failed downloads have the class `aopdata_network`, so they can be caught with `tryCatch()` or `withCallingHandlers()`. Download failure messages are now `rlang_message`s (previously `cliMessage`). The wording of the errors for invalid arguments, `mode` and `showProgress` changed, so match on the condition class rather than on the message text.
+- The "Downloading ... data" messages are now only shown when `showProgress = TRUE`. The "Using mode" message was removed.
+
 # aopdata v1.1.2
 
 **Minor changes**

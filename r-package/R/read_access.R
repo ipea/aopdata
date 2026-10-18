@@ -143,8 +143,8 @@ read_access <- function(city = NULL,
                         showProgress = TRUE){
 
   # checks
-  checkmate::assert_logical(peak)
-  checkmate::assert_logical(geometry)
+  abort_if_invalid(checkmate::check_logical(peak), "peak")
+  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
 
   # remove accents
   city <- tolower(city)
@@ -171,7 +171,9 @@ read_access <- function(city = NULL,
   check_downloaded_obj(temp_meta) # nocov
   if (is.null(temp_meta)) { return(invisible(NULL)) }
 
-  message(paste0("Downloading accessibility data for the year ", year))
+  if (isTRUE(showProgress)) {
+    cli::cli_inform("Downloading accessibility data for the year {year}")
+  }
 
 
   # cities with public transport
@@ -197,7 +199,7 @@ read_access <- function(city = NULL,
   if (isFALSE(cities_with_pt_check) & mode == 'public_transport') {
     cities_available <- paste(cities_with_pt, collapse = ", ")
     error_msg <- "The only cities with public transport data in {year} are: {cities_available}."
-    cli::cli_abort(error_msg)
+    cli::cli_abort(error_msg, class = "aopdata_error")
     }
 
   if (any(city == 'all') & mode=='public_transport') {

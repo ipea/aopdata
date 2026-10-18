@@ -22,7 +22,10 @@
 aopdata_dictionary <- function(lang='en'){
 
   # checks
-  checkmate::assert_string(lang, pattern = 'en|pt', null.ok = FALSE)
+  abort_if_invalid(
+    checkmate::check_string(lang, pattern = 'en|pt', null.ok = FALSE),
+    "lang"
+  )
 
   # test server connection
   try( silent = TRUE,
