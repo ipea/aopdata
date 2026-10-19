@@ -202,3 +202,109 @@ testthat::test_that("aop_fetch reports an interrupted download as aborted", {
     c("aborted", "aborted")
   )
 })
+
+
+
+### download_metadata (offline: aop_fetch is mocked) ----------------
+
+# moves the session's cached metadata aside; restore() puts it back
+stash_metadata_cache <- function() {
+  tempf <- file.path(tempdir(), "metadata_aopdata.csv")
+  backup <- tempfile(fileext = ".csv")
+  had_cache <- file.exists(tempf)
+  if (had_cache) file.rename(tempf, backup)
+  restore <- function() {
+    unlink(c(tempf, paste0(tempf, ".part")))
+    if (had_cache) file.rename(backup, tempf)
+  }
+  list(path = tempf, restore = restore)
+}
+
+write_metadata_fixture <- function(path) {
+  data.table::fwrite(
+    data.table::data.table(type = "grid", city = "nat", year = NA, mode = NA,
+                           download_path = "x", download_path2 = "y",
+                           name_muni = "natal"),
+    path
+  )
+}
+
+testthat::test_that("download_metadata falls back to the Ipea server", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  tempf <- cache$path
+  calls <- character()
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) {
+      calls <<- c(calls, urls)
+      if (grepl("github.com", urls)) return("http_error")
+      write_metadata_fixture(paths)
+      "ok"
+    }
+  )
+  testthat::expect_equal(count_network_msgs(meta <- download_metadata()), 0)
+  testthat::expect_equal(meta$city, "nat")
+  testthat::expect_length(calls, 2)
+  testthat::expect_match(calls[2], "ipea.gov.br")
+  testthat::expect_true(file.exists(tempf))
+})
+
+testthat::test_that("download_metadata replaces a cached file that can't be read", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  tempf <- cache$path
+  writeLines("Not Found", tempf)
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) { write_metadata_fixture(paths); "ok" }
+  )
+  testthat::expect_equal(download_metadata()$city, "nat")
+  testthat::expect_equal(read_metadata(tempf)$city, "nat")
+})
+
+testthat::test_that("download_metadata reuses a valid cached file", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  tempf <- cache$path
+  write_metadata_fixture(tempf)
+  testthat::local_mocked_bindings(
+    aop_fetch = function(...) stop("aop_fetch should not be called")
+  )
+  testthat::expect_equal(download_metadata()$city, "nat")
+})
+
+testthat::test_that("download_metadata fails gracefully, caching nothing", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  tempf <- cache$path
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) {
+      writeLines("<html>error page</html>", paths)
+      "ok"
+    }
+  )
+  testthat::expect_equal(count_network_msgs(out <- download_metadata()), 1)
+  testthat::expect_null(out)
+  testthat::expect_false(file.exists(tempf))
+  testthat::expect_false(file.exists(paste0(tempf, ".part")))
+})
+
+testthat::test_that("download_metadata says when there is no internet", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  testthat::local_mocked_bindings(has_internet = function() FALSE, .package = "curl")
+  testthat::expect_equal(count_network_msgs(out <- download_metadata()), 1)
+  testthat::expect_null(out)
+})
+
+testthat::test_that("download_metadata stops without the second source when interrupted", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  calls <- 0
+  testthat::local_mocked_bindings(
+    aop_fetch = function(...) { calls <<- calls + 1; "aborted" }
+  )
+  testthat::expect_equal(count_network_msgs(out <- download_metadata()), 0)
+  testthat::expect_null(out)
+  testthat::expect_equal(calls, 1)
+  testthat::expect_false(file.exists(cache$path))
+})

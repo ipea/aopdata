@@ -71,8 +71,9 @@ aopdata/                          # git root
     └── README.md                 # CRAN README (plain .md, no .Rmd)
 ```
 
-Data flow: `select_metadata(t, c, y, m)` reads `metadata.csv` (GitHub release
-`v1.0.0` first, Ipea server fallback) and returns the file URLs →
+Data flow: `select_metadata(t, c, y, m)` reads `metadata.csv` (`download_metadata()`:
+GitHub release `v1.0.0` first, Ipea server fallback, via `aop_fetch()`; cached only
+after `read_metadata()` validates it) and returns the file URLs →
 `download_data()` downloads each file with httr2 (`aop_fetch()`, parallel) from
 the Ipea server, retries failed files from the GitHub release, and saves them
 to `tempdir()` (session cache, `.part` then rename) → `load_data()` reads

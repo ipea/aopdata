@@ -1,65 +1,83 @@
 #' Support function to download metadata internally used in aopdata
 #'
+#' @description Downloads `metadata.csv` from the GitHub release or, if that
+#'              fails, from the Ipea server, and caches it in `tempdir()` for
+#'              the session. A file is cached only once it has been read
+#'              successfully; a cached file that can't be read is downloaded
+#'              again.
+#'
+#' @return A `data.table` with the metadata, or `NULL` (with a message) if it
+#'         could not be downloaded.
 #' @keywords internal
 #' @examples \dontrun{ if (interactive()) {
 #' df <- download_metadata()
 #' }}
 #'
-download_metadata <- function(){ # nocov start
+download_metadata <- function(){
 
-  # create tempfile to save metadata
+  # metadata cached in this session
   tempf <- file.path(tempdir(), "metadata_aopdata.csv")
+  metadata <- read_metadata(tempf)
+  if (!is.null(metadata)) { return(metadata) }
 
-  # IF metadata has already been successfully downloaded
-  if (file.exists(tempf) & file.info(tempf)$size != 0) {
-
-  } else {
-
-    # test server connection with github
-    metadata_link <- 'https://github.com/ipea/aopdata/releases/download/v1.0.0/metadata.csv'
-    try( silent = TRUE,
-         check_con <- check_connection(metadata_link, silent = TRUE)
-         )
-
-    # if connection with github fails, try connection with ipea
-    if (is.null(check_con) | isFALSE(check_con)) {
-      metadata_link <- 'https://www.ipea.gov.br/geobr/aopdata/metadata/metadata.csv'
-      try( silent = TRUE,
-           check_con <- check_connection(metadata_link, silent = FALSE)
-           )
-
-      if (is.null(check_con) | isFALSE(check_con)) { return(invisible(NULL)) }
-      }
-
-    # download metadata to temp file
-    try( silent = TRUE,
-         downloaded_files <- curl::multi_download(
-           urls = metadata_link,
-           destfiles = tempf,
-           progress = FALSE,
-           resume = TRUE
-
-           )
-         )
-
-    # if anything fails, return NULL
-    if (any(!downloaded_files$success | is.na(downloaded_files$success))) {
-      msg <- "File cached locally seems to be corrupted. Please download it again."
-      inform_failure(msg)
-      return(invisible(NULL))
-    }
-  }
-
- # read metadata
-  metadata <- data.table::fread(tempf, stringsAsFactors=FALSE)
-
-  # check if data was read Ok
-  if (nrow(metadata)==0) {
-    msg <- "A file must have been corrupted during download. Please restart your R session and download the data again."
-    inform_failure(msg)
+  if (!curl::has_internet()) {
+    inform_failure("No internet connection.")
     return(invisible(NULL))
   }
 
-  return(metadata)
+  # partial file while downloading
+  part <- paste0(tempf, ".part")
+  on.exit(unlink(part[file.exists(part)]), add = TRUE)
 
-}  # nocov end
+  # try the GitHub release, then the Ipea server
+  urls <- c('https://github.com/ipea/aopdata/releases/download/v1.0.0/metadata.csv',
+            'https://www.ipea.gov.br/geobr/aopdata/metadata/metadata.csv')
+
+  for (u in urls) {
+    status <- aop_fetch(u, part)
+
+    # the user interrupted the download
+    if (identical(status, "aborted")) { return(invisible(NULL)) }
+
+    # keep the file only if it can be read
+    metadata <- if (identical(status, "ok")) read_metadata(part) else NULL
+    if (!is.null(metadata)) {
+      suppressWarnings(file.rename(part, tempf))
+      return(metadata)
+    }
+  }
+
+  msg <- paste("Could not download the metadata from GitHub or the Ipea server.",
+               "Please try again later.")
+  inform_failure(msg)
+  return(invisible(NULL))
+}
+
+
+
+
+#' Read and validate a metadata file
+#'
+#' @param path Path to a metadata csv file.
+#'
+#' @return A `data.table`, or `NULL` if the file is missing, can't be read,
+#'         is empty or lacks the columns used by the package.
+#' @keywords internal
+#'
+read_metadata <- function(path) {
+
+  if (!file.exists(path) || isTRUE(file.size(path) == 0)) { return(NULL) }
+
+  metadata <- tryCatch(
+    suppressWarnings(data.table::fread(path, stringsAsFactors = FALSE)),
+    error = function(e) NULL
+  )
+
+  needed <- c("type", "city", "year", "mode", "download_path2", "name_muni")
+  if (is.null(metadata) || nrow(metadata) == 0 ||
+      !all(needed %in% names(metadata))) {
+    return(NULL)
+  }
+
+  return(metadata)
+}

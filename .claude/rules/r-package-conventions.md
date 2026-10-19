@@ -105,8 +105,9 @@ This is the package's most important invariant.
   then again for the GitHub mirror for the files that failed. Results are
   classified per file by `classify_resp()` (`ok` / `http_error` /
   `conn_error` / `aborted`); an abort never triggers the mirror.
-  `check_connection()` (curl) is still used by `download_metadata()` and
-  `aopdata_dictionary()`, with `silent = TRUE` in internal calls.
+  `download_metadata()` uses `aop_fetch()` too (GitHub first, then Ipea) and
+  caches `metadata.csv` only after `read_metadata()` validates it.
+  `check_connection()` (curl) is used only by `aopdata_dictionary()`.
 - **Mirrors:** `metadata.csv` comes from the GitHub release `v1.0.0` first and
   the Ipea server (`www.ipea.gov.br/geobr/aopdata/`) as fallback. Data files
   come from the Ipea URL in `metadata$download_path2` first, with the GitHub
