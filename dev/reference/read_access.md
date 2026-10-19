@@ -178,7 +178,4 @@ all <- read_access(
   year = 2019,
   showProgress = FALSE
 )
-#> ✖ File cached locally seems to be corrupted. Please download it again.
-#> ✖ No internet connection.
-#> ✖ No internet connection.
 ```

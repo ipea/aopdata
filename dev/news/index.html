@@ -49,7 +49,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="aopdata-development-version">aopdata (development version)<a class="anchor" aria-label="anchor" href="#aopdata-development-version"></a></h2>
-<p><strong>Minor changes</strong></p>
+<p><strong>Major changes</strong></p>
+<ul><li>Data files are now downloaded with {httr2}. If a file can’t be downloaded from the Ipea server, that file is downloaded from the GitHub mirror, so a single unavailable file or server no longer makes the whole request fail. The progress bar now counts files rather than bytes.</li>
+<li>aopdata now requires R &gt;= 4.1.0 (a requirement of {httr2}).</li>
+</ul><p><strong>Bug fixes</strong></p>
+<ul><li>HTTP errors (e.g. 404 pages) are no longer saved and read as data.</li>
+<li>Interrupted or corrupted downloads are no longer reused from the session cache: files are saved only once they are complete, and a cached file that can’t be read is removed.</li>
+<li>Downloads that stall are now stopped instead of hanging the R session.</li>
+</ul><p><strong>Minor changes</strong></p>
 <ul><li>All messages and errors now use {cli}. Errors have the condition class <code>aopdata_error</code>, and messages about failed downloads have the class <code>aopdata_network</code>, so they can be caught with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> or <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>. Download failure messages are now <code>rlang_message</code>s (previously <code>cliMessage</code>). The wording of the errors for invalid arguments, <code>mode</code> and <code>showProgress</code> changed, so match on the condition class rather than on the message text.</li>
 <li>The “Downloading … data” messages are now only shown when <code>showProgress = TRUE</code>. The “Using mode” message was removed.</li>
 </ul></div>

@@ -1,7 +1,8 @@
 # Download data to a temporary directory.
 
-Save requested data (either an `sf` or a `data.frame`) to a temporary
-directory.
+Downloads the requested files to a temporary directory (the session
+cache) and reads them. Each file is downloaded from the Ipea server
+first and, if that fails, from the GitHub release mirror.
 
 ## Usage
 
@@ -21,5 +22,5 @@ download_data(url, progress_bar = showProgress)
 
 ## Value
 
-No visible output. The downloaded file (either an `sf` or a
-`data.frame`) is saved to a temporary directory.
+An `sf` or a `data.frame`, or `NULL` (with a message) if any file could
+not be downloaded or read.
