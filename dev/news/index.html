@@ -59,7 +59,9 @@
 <li>The metadata file is now downloaded with the same downloader as the data files (GitHub release first, Ipea server as fallback), and cached only once it has been read successfully. A broken cached metadata file is downloaded again instead of making every later call in the session fail.</li>
 <li>When a download fails, the user now sees one message that says what failed. Previously the functions could print “No internet connection.” up to three times, even when only one file was unavailable.</li>
 </ul><p><strong>Minor changes</strong></p>
-<ul><li>City codes and names can now be mixed, in any capitalisation and with or without accents, in every function (e.g. <code>city = c('nat', 'São Paulo')</code>). Previously a mix returned <code>NULL</code> or a misleading error, and only <code><a href="../reference/read_access.html">read_access()</a></code> accepted upper-case city codes and <code>'ALL'</code>.</li>
+<ul><li>Documentation corrected to match the data: the years and cities of each transport mode, the off-peak window, time thresholds, the TMI indicators, the defaults of <code>read_population(year)</code> and <code>read_grid(showProgress)</code>, and return types.</li>
+<li>Typos fixed in the documentation and vignettes; the package citation (<code>citation("aopdata")</code>) now lists the two Ipea discussion papers as technical reports, with their DOIs.</li>
+<li>City codes and names can now be mixed, in any capitalisation and with or without accents, in every function (e.g. <code>city = c('nat', 'São Paulo')</code>). Previously a mix returned <code>NULL</code> or a misleading error, and only <code><a href="../reference/read_access.html">read_access()</a></code> accepted upper-case city codes and <code>'ALL'</code>.</li>
 <li>Invalid inputs now give a clear error before any data is downloaded: <code>city</code> missing, <code>NULL</code>, <code>NA</code> or not text; an unknown city (the error names it and lists the valid codes and names); and a <code>mode</code> that a requested city doesn’t have (the error names the city and lists the cities with that mode).</li>
 <li>
 <code>peak</code>, <code>geometry</code> and <code>showProgress</code> must be a single <code>TRUE</code> or <code>FALSE</code>. <code>showProgress = 1</code>/<code>0</code> is no longer accepted, and <code>NA</code> or vectors give an error instead of a base R error. A vector <code>year</code> also gives a clear error; one year per call is supported.</li>
@@ -137,7 +139,7 @@
 </ul><p><strong>Minor changes</strong></p>
 <ul><li>
 <code>read_</code> functions now have no default value for the <code>city</code> parameter. <a href="https://github.com/ipea/aopdata/issues/38" class="external-link">Closes </a><a href="https://github.com/ipea/aopdata/issues/38" class="external-link">#38</a>.</li>
-<li>Fixed <code>ERROR</code> message when there is no data for a particular transport mode for an specific city &amp; year.</li>
+<li>Fixed <code>ERROR</code> message when there is no data for a particular transport mode for a specific city &amp; year.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="aopdata-v023">aopdata v0.2.3<a class="anchor" aria-label="anchor" href="#aopdata-v023"></a></h2><p class="text-muted">CRAN release: 2022-01-28</p>
@@ -150,7 +152,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="aopdata-v022">aopdata v0.2.2<a class="anchor" aria-label="anchor" href="#aopdata-v022"></a></h2><p class="text-muted">CRAN release: 2021-04-30</p>
 <p><strong>Minor changes</strong></p>
-<ul><li>Adds <code>crul</code> as a package dependency. Now aoptadata fails gracefully when there is internet connection problems. Closes <a href="https://github.com/ipea/aopdata/issues/32" class="external-link">#32</a>.</li>
+<ul><li>Adds <code>crul</code> as a package dependency. Now aopdata fails gracefully when there is internet connection problems. Closes <a href="https://github.com/ipea/aopdata/issues/32" class="external-link">#32</a>.</li>
 <li>
 <code>showProgress</code> now sets to <code>FALSE</code> in all tests, examples and vignettes. Closes <a href="https://github.com/ipea/aopdata/issues/32" class="external-link">#32</a>.</li>
 <li>skip tests on CRAN. Tests are run only locally</li>

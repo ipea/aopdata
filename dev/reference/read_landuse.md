@@ -1,12 +1,12 @@
 # Download land use and population data
 
 Download data on the spatial distribution of population, jobs, schools,
-health care and social assitance facilities at a fine spatial resolution
-for the cities included in the AOP project. See the documentation
-'Details' for the data dictionary. The data set reports information for
-each heaxgon in a H3 spatial grid at resolution 9, with a side of 174
-meters and an area of 0.10 km2. More information about H3 at
-<https://h3geo.org/docs/core-library/restable/>.
+health care and social assistance facilities at a fine spatial
+resolution for the cities included in the AOP project. See the
+documentation 'Details' for the data dictionary. The data set reports
+information for each hexagon in a H3 spatial grid at resolution 9, with
+a side of 174 meters and an area of 0.10 km2. More information about H3
+at <https://h3geo.org/docs/core-library/restable/>.
 
 ## Usage
 
@@ -38,7 +38,8 @@ read_landuse(city = NULL, year = 2019, geometry = FALSE, showProgress = TRUE)
 
 ## Value
 
-A `data.frame` object or an `sf data.frame` object
+A `data.table`, or an `sf` object (which also inherits from
+`data.table`) when `geometry = TRUE`.
 
 ## Data dictionary:
 
@@ -54,7 +55,7 @@ A `data.frame` object or an `sf data.frame` object
 | sociodemographic | P002 | Number of white residents |  |
 | sociodemographic | P003 | Number of black residents |  |
 | sociodemographic | P004 | Number of indigenous residents |  |
-| sociodemographic | P005 | Number of asian-descendents residents |  |
+| sociodemographic | P005 | Number of Asian-descendant residents |  |
 | sociodemographic | P006 | Number of men |  |
 | sociodemographic | P007 | Number of women |  |
 | sociodemographic | P010 | Number of people between 0 and 5 years old |  |

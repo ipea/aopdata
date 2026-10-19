@@ -41,7 +41,7 @@ ggplot() +
 
 ## Spatial distribution of schools
 
-In this case below, elementary schools with the column`E003`.
+In this case below, elementary schools with the column `E003`.
 
 ``` r
 
@@ -56,7 +56,7 @@ ggplot() +
 
 ## Spatial distribution of healthcare
 
-In this example, we mape high-complexity health care facilities (column
+In this example, we map high-complexity health care facilities (column
 `S004`).
 
 ``` r

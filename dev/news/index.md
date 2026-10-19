@@ -30,6 +30,13 @@
 
 **Minor changes**
 
+- Documentation corrected to match the data: the years and cities of
+  each transport mode, the off-peak window, time thresholds, the TMI
+  indicators, the defaults of `read_population(year)` and
+  `read_grid(showProgress)`, and return types.
+- Typos fixed in the documentation and vignettes; the package citation
+  (`citation("aopdata")`) now lists the two Ipea discussion papers as
+  technical reports, with their DOIs.
 - City codes and names can now be mixed, in any capitalisation and with
   or without accents, in every function
   (e.g. `city = c('nat', 'São Paulo')`). Previously a mix returned
@@ -175,7 +182,7 @@ CRAN release: 2022-08-12
   [Closes](https://github.com/ipea/aopdata/issues/38)
   [\#38](https://github.com/ipea/aopdata/issues/38).
 - Fixed `ERROR` message when there is no data for a particular transport
-  mode for an specific city & year.
+  mode for a specific city & year.
 
 ## aopdata v0.2.3
 
@@ -196,8 +203,8 @@ CRAN release: 2021-04-30
 
 **Minor changes**
 
-- Adds `crul` as a package dependency. Now aoptadata fails gracefully
-  when there is internet connection problems. Closes
+- Adds `crul` as a package dependency. Now aopdata fails gracefully when
+  there is internet connection problems. Closes
   [\#32](https://github.com/ipea/aopdata/issues/32).
 - `showProgress` now sets to `FALSE` in all tests, examples and
   vignettes. Closes [\#32](https://github.com/ipea/aopdata/issues/32).

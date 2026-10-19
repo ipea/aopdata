@@ -59,10 +59,10 @@ palma_ratio
 ```
 
 This means that the 10% wealthiest population could access by public
-transport on average 2.6 times more job opportunites than the 40%
+transport on average 2.6 times more job opportunities than the 40%
 poorest people in less than 60 min.
 
-## Inequality in travel time to closes hospital
+## Inequality in travel time to closest hospital
 
 ``` r
 

@@ -20,7 +20,7 @@ aopdata_dictionary(lang = 'en')
 | sociodemographic | P002 | Number of white residents |  |
 | sociodemographic | P003 | Number of black residents |  |
 | sociodemographic | P004 | Number of Indigenous residents |  |
-| sociodemographic | P005 | Number of asian-descendents residents |  |
+| sociodemographic | P005 | Number of Asian-descendant residents |  |
 | sociodemographic | P006 | Number of men |  |
 | sociodemographic | P007 | Number of women |  |
 | sociodemographic | P010 | Number of people between 0 and 5 years old |  |
@@ -35,7 +35,7 @@ aopdata_dictionary(lang = 'en')
 | sociodemographic | R003 | Income decile group | 1 (poorest), 2, 3, 4, 5, 6, 7, 8, 9, 10 (richest) |
 | land use | T001 | Total number of formal jobs |  |
 | land use | T002 | Number of formal jobs with primary education |  |
-| land use | T003 | Number of formal jobs with secuodary education |  |
+| land use | T003 | Number of formal jobs with secondary education |  |
 | land use | T004 | Number of formal jobs with tertiary education |  |
 | land use | E001 | Total number of public schools |  |
 | land use | E002 | Number of public schools - early childhood |  |
@@ -67,7 +67,7 @@ opportunity / population 3) Time threshold
 |----|----|----|
 | CMA | Cumulative opportunity measure (active) |  |
 | CMP | Cumulative opportunity measure (passive) |  |
-| TMI | Travel time to closest opportunity | Value = Inf when travel time is longer than 2h (public transport or car) or 1,5h (walking or bicycle) |
+| TMI | Travel time to closest opportunity | Value = Inf when no opportunity is reachable within the maximum travel time considered in the routing |
 
 #### 2) Type of opportunity / population
 
@@ -75,7 +75,7 @@ opportunity / population 3) Time threshold
 |----|----|----|
 | TT | All jobs | CMA indicator |
 | TB | Jobs with primary education | CMA indicator |
-| TM | Jobs with secuodary education | CMA indicator |
+| TM | Jobs with secondary education | CMA indicator |
 | TA | Jobs with tertiary education | CMA indicator |
 | ST | All healthcare facilities | CMA and TMI indicators |
 | SB | Healthcare facilities - Low complexity | CMA and TMI indicators |
@@ -85,10 +85,10 @@ opportunity / population 3) Time threshold
 | EI | Public schools - early childhood | CMA and TMI indicators |
 | EF | Public schools - elementary schools | CMA and TMI indicators |
 | EM | Public schools - high schools | CMA and TMI indicators |
-| MT | All school enrollments | CMA and TMI indicators |
-| MI | School enrollments - early childhood | CMA and TMI indicators |
-| MF | School enrollments - elementary schools | CMA and TMI indicators |
-| MM | School enrollments - high schools | CMA and TMI indicators |
+| MT | All school enrollments | CMA indicator |
+| MI | School enrollments - early childhood | CMA indicator |
+| MF | School enrollments - elementary schools | CMA indicator |
+| MM | School enrollments - high schools | CMA indicator |
 | CT | All Social Assistance Reference Centers (CRAS) | CMA and TMI indicators |
 
 | People | Description | Observation: available in combination with |
@@ -99,7 +99,7 @@ opportunity / population 3) Time threshold
 | PB | White population | CMP indicator |
 | PA | Asian-descendent population | CMP indicator |
 | PI | Indigenous population | CMP indicator |
-| PN | Back population | CMP indicator |
+| PN | Black population | CMP indicator |
 | P0005I | Population between 0 and 5 years old | CMP indicator |
 | P0614I | Population between 6 and 14 years old | CMP indicator |
 | P1518I | Population between 15 and 18 years old | CMP indicator |
@@ -112,7 +112,7 @@ opportunity / population 3) Time threshold
 
 | Time threshold | Description | Observation: only applicable to |
 |----|----|----|
-| 15 | Opportunities accessible within 15 min. | Active transport modes |
+| 15 | Opportunities accessible within 15 min. | All transport modes |
 | 30 | Opportunities accessible within 30 min. | All transport modes |
 | 45 | Opportunities accessible within 45 min. | Active transport modes |
 | 60 | Opportunities accessible within 60 min. | All transport modes |
@@ -122,7 +122,7 @@ opportunity / population 3) Time threshold
 ## Examples
 
 - **CMAEF30**: Number of elementary schools accessible within 30 minutes
-- **TMISB**: Travel time from to the closest healthcare facility with
-  low complexity services
+- **TMISB**: Travel time to the closest healthcare facility with low
+  complexity services
 - **CMPPM60**: Number of women who can access a given hexagon cell in
   under 60 minutes

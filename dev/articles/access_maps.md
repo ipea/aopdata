@@ -48,7 +48,7 @@ ggplot() +
   geom_sf(data=df, aes(fill=CMAET30), color=NA, alpha=.9) +
   scale_fill_viridis_c(option = "cividis", labels=scales::comma) +
     labs(title='Number of schools accessible', fill="Accessibility",
-       subtitle='by public transport in less than 30 min.', fill="N. of schools") +
+       subtitle='by public transport in less than 30 min.') +
   theme_void()
 ```
 

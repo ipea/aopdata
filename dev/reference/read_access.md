@@ -3,7 +3,7 @@
 Download estimates of access to employment, health, education and social
 assistance services by transport mode and time of the day for the cities
 included in the AOP project. See the documentation 'Details' for the
-data dictionary. The data set reports information for each heaxgon in a
+data dictionary. The data set reports information for each hexagon in a
 H3 spatial grid at resolution 9, with a side of 174 meters and an area
 of 0.10 km2. More information about H3 at
 <https://h3geo.org/docs/core-library/restable/>.
@@ -30,15 +30,18 @@ read_access(
 
 - mode:
 
-  Character. A transport mode. Modes available include
-  'public_transport', 'bicycle', or 'walk' (the default).
+  Character. A transport mode: `'walk'` (the default), `'bicycle'`,
+  `'public_transport'` or `'car'`. See 'Cities available' for the years
+  and cities of each mode.
 
 - peak:
 
   Logical. If `TRUE` (the default), returns accessibility estimates
   during peak time, between 6am and 8am. If `FALSE`, returns
-  accessibility during off-peak, between 2pm and 4am. This argument only
-  takes effect when `mode` is either `car` or `public_transport`.
+  accessibility during off-peak, between 2pm and 4pm. Only used for
+  `car` and `public_transport`. Walking and cycling accessibility does
+  not vary by time of day, so for these modes `peak` is ignored and the
+  `peak` column is always 1.
 
 - year:
 
@@ -57,7 +60,15 @@ read_access(
 
 ## Value
 
-A `data.frame` object
+A `data.table`, or an `sf` object (which also inherits from
+`data.table`) when `geometry = TRUE`.
+
+## Details
+
+The output also includes the land use and population columns returned by
+[`read_landuse()`](https://ipea.github.io/aopdata/dev/reference/read_landuse.md);
+see its documentation or
+[`aopdata_dictionary()`](https://ipea.github.io/aopdata/dev/reference/aopdata_dictionary.md).
 
 ## Data dictionary:
 
@@ -79,7 +90,7 @@ opportunity / population 3) Time threshold
 | **Indicator** | **Description** | **Observation** |
 | CMA | Cumulative opportunity measure (active) |  |
 | CMP | Cumulative opportunity measure (passive) |  |
-| TMI | Travel time to closest opportunity | Value = Inf when travel time is longer than 2h (public transport or car) or 1,5h (walking or bicycle) |
+| TMI | Travel time to closest opportunity | Value = Inf when no opportunity is reachable within the maximum travel time considered in the routing |
 
 ### 2) Type of opportunity / population
 
@@ -98,10 +109,10 @@ opportunity / population 3) Time threshold
 | EI | Public schools - early childhood | CMA and TMI indicators |
 | EF | Public schools - elementary schools | CMA and TMI indicators |
 | EM | Public schools - high schools | CMA and TMI indicators |
-| MT | All school enrollments | CMA and TMI indicators |
-| MI | School enrollments - early childhood | CMA and TMI indicators |
-| MF | School enrollments - elementary schools | CMA and TMI indicators |
-| MM | School enrollments - high schools | CMA and TMI indicators |
+| MT | All school enrollments | CMA indicator |
+| MI | School enrollments - early childhood | CMA indicator |
+| MF | School enrollments - elementary schools | CMA indicator |
+| MM | School enrollments - high schools | CMA indicator |
 | CT | All Social Assistance Reference Centers (CRAS) | CMA and TMI indicators |
 
 |  |  |  |
@@ -113,7 +124,7 @@ opportunity / population 3) Time threshold
 | PB | White population | CMP indicator |
 | PA | Asian-descendent population | CMP indicator |
 | PI | Indigenous population | CMP indicator |
-| PN | Back population | CMP indicator |
+| PN | Black population | CMP indicator |
 | P0005I | Population between 0 and 5 years old | CMP indicator |
 | P0614I | Population between 6 and 14 years old | CMP indicator |
 | P1518I | Population between 15 and 18 years old | CMP indicator |
@@ -127,7 +138,7 @@ opportunity / population 3) Time threshold
 |  |  |  |
 |----|----|----|
 | **Time threshold** | \*\*Description \*\* | **Observation: only applicable to** |
-| 15 | Opportunities accessible within 15 min. | Active transport modes |
+| 15 | Opportunities accessible within 15 min. | All transport modes |
 | 30 | Opportunities accessible within 30 min. | All transport modes |
 | 45 | Opportunities accessible within 45 min. | Active transport modes |
 | 60 | Opportunities accessible within 60 min. | All transport modes |
@@ -136,29 +147,33 @@ opportunity / population 3) Time threshold
 
 ### 4) Cities available
 
-|                 |                               |                     |
-|-----------------|-------------------------------|---------------------|
-| **City name**   | **Three-letter abbreviation** | **Transport modes** |
-| Belem           | `bel`                         | Active              |
-| Belo Horizonte  | `bho`                         | All                 |
-| Brasilia        | `bsb`                         | Active              |
-| Campinas        | `cam`                         | All                 |
-| Campo Grande    | `cgr`                         | Active              |
-| Curitiba        | `cur`                         | Active              |
-| Duque de Caxias | `duq`                         | Active              |
-| Fortaleza       | `for`                         | All                 |
-| Goiania         | `goi`                         | All                 |
-| Guarulhos       | `gua`                         | Active              |
-| Maceio          | `mac`                         | Active              |
-| Manaus          | `man`                         | Active              |
-| Natal           | `nat`                         | Active              |
-| Porto Alegre    | `poa`                         | All                 |
-| Recife          | `rec`                         | All                 |
-| Rio de Janeiro  | `rio`                         | All                 |
-| Salvador        | `sal`                         | Active              |
-| Sao Goncalo     | `sgo`                         | Active              |
-| Sao Luis        | `slz`                         | Active              |
-| Sao Paulo       | `spo`                         | All                 |
+Walking and cycling: all cities, 2017 to 2019. Car: all cities, 2019.
+Public transport: `bho`, `cam`, `cur`, `for`, `poa`, `spo` (2017 to
+2019); `rio` (2018 and 2019); `goi`, `rec` (2019).
+
+|                 |                               |
+|-----------------|-------------------------------|
+| **City name**   | **Three-letter abbreviation** |
+| Belem           | `bel`                         |
+| Belo Horizonte  | `bho`                         |
+| Brasilia        | `bsb`                         |
+| Campinas        | `cam`                         |
+| Campo Grande    | `cgr`                         |
+| Curitiba        | `cur`                         |
+| Duque de Caxias | `duq`                         |
+| Fortaleza       | `for`                         |
+| Goiania         | `goi`                         |
+| Guarulhos       | `gua`                         |
+| Maceio          | `mac`                         |
+| Manaus          | `man`                         |
+| Natal           | `nat`                         |
+| Porto Alegre    | `poa`                         |
+| Recife          | `rec`                         |
+| Rio de Janeiro  | `rio`                         |
+| Salvador        | `sal`                         |
+| Sao Goncalo     | `sgo`                         |
+| Sao Luis        | `slz`                         |
+| Sao Paulo       | `spo`                         |
 
 ## Examples
 
