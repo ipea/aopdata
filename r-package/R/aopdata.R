@@ -14,7 +14,7 @@
 #' @name aopdata
 #' @aliases aopdata-package
 #'
-#' @importFrom data.table setDT := %like%
+#' @importFrom data.table setDT :=
 #' @importFrom utils globalVariables
 #' @importFrom methods is
 #' @keywords internal
@@ -23,5 +23,5 @@
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1") utils::globalVariables(
-  c('geometry', 'i.geom', 'id_hex', 'showProgress', 'type', '.', ':=', '%like%'))
+  c('geometry', 'i.geom', 'id_hex', 'type', '.', ':='))
 

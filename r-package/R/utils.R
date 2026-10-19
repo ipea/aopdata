@@ -199,13 +199,13 @@ select_metadata <- function(t=NULL, c=NULL, y=NULL, m=NULL){
 #'              release mirror.
 #'
 #' @param url A string with the url address of aop dataset
-#' @param progress_bar Logical. Defaults to (TRUE) display progress bar
+#' @param progress_bar Logical. Whether to display a progress bar.
 #'
 #' @return An `sf` or a `data.frame`, or `NULL` (with a message) if any file
 #'         could not be downloaded or read.
 #' @keywords internal
 #'
-download_data <- function(url, progress_bar = showProgress){
+download_data <- function(url, progress_bar){
 
   # check showProgress input
   if (!(progress_bar %in% c(TRUE, FALSE))) {
@@ -386,39 +386,32 @@ aop_fetch <- function(urls, paths, progress = FALSE,
 #'
 #' @description Reads data from tempdir to global environment.
 #'
-#' @param temps The address of a data file stored in tempdir. Defaults to NULL
+#' @param temps The paths of one or more data files stored in tempdir, all
+#'        `.csv` or all `.gpkg`.
 #'
 #' @return Returns either an `sf` or a `data.frame`, depending of the data set
 #'         that was downloaded
 #' @keywords internal
 #'
-load_data <- function(temps=NULL){
+load_data <- function(temps){
 
-  # check if .csv or geopackage
-  if( temps[1] %like% '.csv' ){ fformat <- 'csv'}
-  if( temps[1] %like% '.gpkg' ){ fformat <- 'gpkg'}
-
-  ### one single file
-  if (length(temps)==1) {
-
-    # read file
-    if( fformat=='csv' ){ temp <- data.table::fread(temps) }
-    if( fformat=='gpkg' ){ temp <- sf::st_read(temps, quiet=T) }
+  # all files of one request have the same type: .csv or .gpkg
+  fformat <- unique(sub('.*\\.', '', basename(temps)))
+  if (length(fformat) != 1 || !(fformat %in% c('csv', 'gpkg'))) {
+    cli::cli_abort("Unsupported data file: {.file {basename(temps)}}.",
+                   class = "aopdata_error")
   }
 
-  ### multiple files
-  else if (length(temps) > 1) {
+  # csv
+  if (fformat == 'csv') {
+    files <- lapply(X=temps, FUN= data.table::fread)
+    temp <- data.table::rbindlist(files, fill = TRUE)
+  }
 
-    # csv
-    if( fformat=='csv' ){
-      files <- lapply(X=temps, FUN= data.table::fread)
-      temp <- data.table::rbindlist(files, fill = TRUE)
-    }
-    # geopackage
-    if( fformat=='gpkg' ){
-      files <- lapply(X=temps, FUN= sf::st_read, quiet=T)
-      temp <- sf::st_as_sf(data.table::rbindlist(files, fill = TRUE))
-    }
+  # geopackage; sf's rbind method recomputes the bbox of the combined geometry
+  if (fformat == 'gpkg') {
+    files <- lapply(X=temps, FUN= sf::st_read, quiet=TRUE)
+    temp <- do.call(rbind, files)
   }
 
   # check if data was read Ok
@@ -429,10 +422,6 @@ load_data <- function(temps=NULL){
   }
 
   return(temp)
-
-  # load data to memory
-  temp_data <- load_data(temps)
-  return(temp_data)
 }
 
 

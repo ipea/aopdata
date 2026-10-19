@@ -4,12 +4,12 @@
 \alias{download_data}
 \title{Download data to a temporary directory.}
 \usage{
-download_data(url, progress_bar = showProgress)
+download_data(url, progress_bar)
 }
 \arguments{
 \item{url}{A string with the url address of aop dataset}
 
-\item{progress_bar}{Logical. Defaults to (TRUE) display progress bar}
+\item{progress_bar}{Logical. Whether to display a progress bar.}
 }
 \value{
 An \code{sf} or a \code{data.frame}, or \code{NULL} (with a message) if any file

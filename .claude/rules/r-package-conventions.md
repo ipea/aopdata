@@ -33,7 +33,7 @@ All paths below are relative to `r-package/`.
 - **Always call `package::function()`**: `data.table::`, `checkmate::`,
   `curl::`, `sf::`, `cli::`, `utils::`.
 - **Exceptions:** the `@importFrom` set in `R/aopdata.R` — `data.table`
-  `setDT`, `:=`, `%like%`; `utils` `globalVariables`;
+  `setDT`, `:=`; `utils` `globalVariables`;
   `methods` `is`. Base `subset()` is used throughout the read functions; keep it
   where it is.
 - ggplot2 functions in vignettes and README, after `library(ggplot2)`.

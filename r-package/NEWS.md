@@ -11,6 +11,7 @@
 - Interrupted or corrupted downloads are no longer reused from the session cache: files are saved only once they are complete, and a cached file that can't be read is removed.
 - Downloads that stall are now stopped instead of hanging the R session.
 - The metadata file is now downloaded with the same downloader as the data files (GitHub release first, Ipea server as fallback), and cached only once it has been read successfully. A broken cached metadata file is downloaded again instead of making every later call in the session fail.
+- Grids (`geometry = TRUE` or `read_grid()`) of several cities now have a bounding box that covers all the cities, and are a plain `sf` data frame. Previously the bounding box covered only the first city, so maps of several cities could be cropped.
 - When a download fails, the user now sees one message that says what failed. Previously the functions could print "No internet connection." up to three times, even when only one file was unavailable.
 
 **Minor changes**

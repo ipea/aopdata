@@ -394,7 +394,14 @@ testthat::test_that("load_data reads one or several geopackages", {
   testthat::expect_s3_class(both, "sf")
   testthat::expect_equal(sort(both$id_hex), c("h1", "h2", "h3"))
   testthat::expect_equal(sf::st_crs(both)$epsg, 4326L)
-  # the bbox of a multi-file result is a known bug (backlog); not asserted
+  testthat::expect_equal(class(both), c("sf", "data.frame"))
+  testthat::expect_equal(unname(sf::st_bbox(both)[c("xmin", "xmax")]), c(1, 101))
+})
+
+testthat::test_that("load_data rejects unsupported or mixed file types", {
+  testthat::expect_error(load_data("aoptest_x.zip"), class = "aopdata_error")
+  testthat::expect_error(load_data(c("aoptest_a.csv", "aoptest_b.gpkg")),
+                         class = "aopdata_error")
 })
 
 testthat::test_that("load_data returns NULL with one message for a file with no rows", {
@@ -418,6 +425,7 @@ testthat::test_that("aop_spatial_join attaches the grid geometry by id_hex", {
   out <- aop_spatial_join(df, grid)
 
   testthat::expect_s3_class(out, "sf")
+  testthat::expect_equal(attr(out, "sf_column"), "geometry")
   testthat::expect_equal(sf::st_crs(out)$epsg, 4326L)
   testthat::expect_equal(sort(out$id_hex), c("h1", "h3", "h9"))
   testthat::expect_true(sf::st_is_empty(out[out$id_hex == "h9", ]))
@@ -438,5 +446,7 @@ testthat::test_that("aop_merge keeps every hexagon of both tables", {
   testthat::expect_equal(nrow(out), 4)
   testthat::expect_equal(sort(out$id_hex), c("h1", "h2", "h3", "h4"))
   testthat::expect_true(is.na(out$mode[out$id_hex == "h1"]))
+  testthat::expect_true(is.na(out$P001[out$id_hex == "h4"]))
+  testthat::expect_equal(out$CMATT30[out$id_hex == "h2"], 1L)
   testthat::expect_equal(anyDuplicated(names(out)), 0)
 })

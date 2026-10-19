@@ -4,10 +4,11 @@
 \alias{load_data}
 \title{Load data from tempdir to global environment}
 \usage{
-load_data(temps = NULL)
+load_data(temps)
 }
 \arguments{
-\item{temps}{The address of a data file stored in tempdir. Defaults to NULL}
+\item{temps}{The paths of one or more data files stored in tempdir, all
+\code{.csv} or all \code{.gpkg}.}
 }
 \value{
 Returns either an \code{sf} or a \code{data.frame}, depending of the data set

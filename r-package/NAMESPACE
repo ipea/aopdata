@@ -6,7 +6,6 @@ export(read_grid)
 export(read_landuse)
 export(read_population)
 importFrom(data.table,
-  "%like%",
   ":=",
   setDT
 )
