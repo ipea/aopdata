@@ -10,7 +10,8 @@ read_grid(city = NULL, showProgress = FALSE)
 \item{city}{Character. A city name or three-letter abbreviation. If
 \code{city="all"}, the function returns data for all cities.}
 
-\item{showProgress}{Logical. Defaults to \code{TRUE} display progress bar.}
+\item{showProgress}{Logical. If \code{TRUE}, displays a progress bar.
+Defaults to \code{FALSE}.}
 }
 \value{
 An \verb{sf data.frame} object

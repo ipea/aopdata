@@ -15,7 +15,8 @@ read_population(
 \item{city}{Character. A city name or three-letter abbreviation. If
 \code{city="all"}, the function returns data for all cities.}
 
-\item{year}{Numeric. A year number in YYYY format. Defaults to 2019.}
+\item{year}{Numeric. Year of the census data. Only 2010 is available
+(the default).}
 
 \item{geometry}{Logical. If \code{FALSE} (the default), returns a regular data.table
 of aop data. If \code{TRUE}, returns an \verb{sf data.frame} with simple
@@ -25,13 +26,14 @@ feature geometry of spatial hexagonal grid H3. See details in
 \item{showProgress}{Logical. Defaults to \code{TRUE} display progress bar.}
 }
 \value{
-A \code{data.frame} object or an \verb{sf data.frame} object
+A \code{data.table}, or an \code{sf} object (which also inherits from
+\code{data.table}) when \code{geometry = TRUE}.
 }
 \description{
 Download population and socioeconomic data from the Brazilian Census at a fine
 spatial resolution for the cities included in the AOP project. See the
 documentation 'Details' for the data dictionary. The data set reports
-information for each heaxgon in a H3 spatial grid at resolution 9, with a
+information for each hexagon in a H3 spatial grid at resolution 9, with a
 side of 174 meters and an area of 0.10 km2. More information about H3 at \url{https://h3geo.org/docs/core-library/restable/}.
 }
 \section{Data dictionary:}{
@@ -46,7 +48,7 @@ side of 174 meters and an area of 0.10 km2. More information about H3 at \url{ht
    sociodemographic \tab P002 \tab Number of white residents \tab  \cr
    sociodemographic \tab P003 \tab Number of black residents \tab  \cr
    sociodemographic \tab P004 \tab Number of indigenous residents \tab  \cr
-   sociodemographic \tab P005 \tab Number of asian-descendents residents \tab  \cr
+   sociodemographic \tab P005 \tab Number of Asian-descendant residents \tab  \cr
    sociodemographic \tab P006 \tab Number of men \tab  \cr
    sociodemographic \tab P007 \tab Number of women \tab  \cr
    sociodemographic \tab P010 \tab Number of people between 0 and 5 years old \tab  \cr

@@ -17,13 +17,16 @@ read_access(
 \item{city}{Character. A city name or three-letter abbreviation. If
 \code{city="all"}, the function returns data for all cities.}
 
-\item{mode}{Character. A transport mode. Modes available include
-'public_transport', 'bicycle', or 'walk' (the default).}
+\item{mode}{Character. A transport mode: \code{'walk'} (the default),
+\code{'bicycle'}, \code{'public_transport'} or \code{'car'}. See 'Cities
+available' for the years and cities of each mode.}
 
 \item{peak}{Logical. If \code{TRUE} (the default), returns accessibility estimates
 during peak time, between 6am and 8am. If \code{FALSE}, returns
-accessibility during off-peak, between 2pm and 4am. This argument
-only takes effect when \code{mode} is either \code{car} or \code{public_transport}.}
+accessibility during off-peak, between 2pm and 4pm. Only used
+for \code{car} and \code{public_transport}. Walking and cycling
+accessibility does not vary by time of day, so for these modes
+\code{peak} is ignored and the \code{peak} column is always 1.}
 
 \item{year}{Numeric. A year number in YYYY format. Defaults to 2019.}
 
@@ -35,15 +38,20 @@ feature geometry of spatial hexagonal grid H3. See details in
 \item{showProgress}{Logical. Defaults to \code{TRUE} display progress bar.}
 }
 \value{
-A \code{data.frame} object
+A \code{data.table}, or an \code{sf} object (which also inherits from
+\code{data.table}) when \code{geometry = TRUE}.
 }
 \description{
 Download estimates of access to employment, health, education and social
 assistance services by transport mode and time of the day for the cities
 included in the AOP project. See the documentation 'Details' for the data
-dictionary. The data set reports information for each heaxgon in a H3 spatial
+dictionary. The data set reports information for each hexagon in a H3 spatial
 grid at resolution 9, with a side of 174 meters and an area of 0.10 km2. More
 information about H3 at \url{https://h3geo.org/docs/core-library/restable/}.
+}
+\details{
+The output also includes the land use and population columns returned
+by \code{\link[=read_landuse]{read_landuse()}}; see its documentation or \code{\link[=aopdata_dictionary]{aopdata_dictionary()}}.
 }
 \section{Data dictionary:}{
 \tabular{llll}{
@@ -61,7 +69,7 @@ population 3) Time threshold
    \strong{Indicator} \tab \strong{Description} \tab \strong{Observation} \cr
    CMA \tab Cumulative opportunity measure (active) \tab  \cr
    CMP \tab Cumulative opportunity measure (passive) \tab  \cr
-   TMI \tab Travel time to closest opportunity \tab Value = Inf when travel time is longer than 2h (public transport or car) or 1,5h (walking or bicycle) \cr
+   TMI \tab Travel time to closest opportunity \tab Value = Inf when no opportunity is reachable within the maximum travel time considered in the routing \cr
 }
 
 }
@@ -80,10 +88,10 @@ population 3) Time threshold
    EI \tab Public schools - early childhood \tab CMA and TMI indicators \cr
    EF \tab Public schools - elementary schools \tab CMA and TMI indicators \cr
    EM \tab Public schools - high schools \tab CMA and TMI indicators \cr
-   MT \tab All school enrollments \tab CMA and TMI indicators \cr
-   MI \tab School enrollments - early childhood \tab CMA and TMI indicators \cr
-   MF \tab School enrollments - elementary schools \tab CMA and TMI indicators \cr
-   MM \tab School enrollments - high schools \tab CMA and TMI indicators \cr
+   MT \tab All school enrollments \tab CMA indicator \cr
+   MI \tab School enrollments - early childhood \tab CMA indicator \cr
+   MF \tab School enrollments - elementary schools \tab CMA indicator \cr
+   MM \tab School enrollments - high schools \tab CMA indicator \cr
    CT \tab All Social Assistance Reference Centers (CRAS) \tab CMA and TMI indicators \cr
 }
 \tabular{lll}{
@@ -94,7 +102,7 @@ population 3) Time threshold
    PB \tab White population \tab CMP indicator \cr
    PA \tab Asian-descendent population \tab CMP indicator \cr
    PI \tab Indigenous population \tab CMP indicator \cr
-   PN \tab Back population \tab CMP indicator \cr
+   PN \tab Black population \tab CMP indicator \cr
    P0005I \tab Population between 0 and 5 years old \tab CMP indicator \cr
    P0614I \tab Population between 6 and 14 years old \tab CMP indicator \cr
    P1518I \tab Population between 15 and 18 years old \tab CMP indicator \cr
@@ -108,7 +116,7 @@ population 3) Time threshold
 
 \subsection{3) Time threshold (only applicable to CMA and CMP estimates)}{\tabular{lll}{
    \strong{Time threshold} \tab **Description	** \tab \strong{Observation: only applicable to} \cr
-   15 \tab Opportunities accessible within 15 min. \tab Active transport modes \cr
+   15 \tab Opportunities accessible within 15 min. \tab All transport modes \cr
    30 \tab Opportunities accessible within 30 min. \tab All transport modes \cr
    45 \tab Opportunities accessible within 45 min. \tab Active transport modes \cr
    60 \tab Opportunities accessible within 60 min. \tab All transport modes \cr
@@ -118,28 +126,32 @@ population 3) Time threshold
 
 }
 
-\subsection{4) Cities available}{\tabular{lll}{
-   \strong{City name} \tab \strong{Three-letter abbreviation} \tab \strong{Transport modes} \cr
-   Belem \tab \code{bel} \tab Active \cr
-   Belo Horizonte \tab \code{bho} \tab All \cr
-   Brasilia \tab \code{bsb} \tab Active \cr
-   Campinas \tab \code{cam} \tab All \cr
-   Campo Grande \tab \code{cgr} \tab Active \cr
-   Curitiba \tab \code{cur} \tab Active \cr
-   Duque de Caxias \tab \code{duq} \tab Active \cr
-   Fortaleza \tab \code{for} \tab All \cr
-   Goiania \tab \code{goi} \tab All \cr
-   Guarulhos \tab \code{gua} \tab Active \cr
-   Maceio \tab \code{mac} \tab Active \cr
-   Manaus \tab \code{man} \tab Active \cr
-   Natal \tab \code{nat} \tab Active \cr
-   Porto Alegre \tab \code{poa} \tab All \cr
-   Recife \tab \code{rec} \tab All \cr
-   Rio de Janeiro \tab \code{rio} \tab All \cr
-   Salvador \tab \code{sal} \tab Active \cr
-   Sao Goncalo \tab \code{sgo} \tab Active \cr
-   Sao Luis \tab \code{slz} \tab Active \cr
-   Sao Paulo \tab \code{spo} \tab All \cr
+\subsection{4) Cities available}{
+
+Walking and cycling: all cities, 2017 to 2019. Car: all cities, 2019.
+Public transport: \code{bho}, \code{cam}, \code{cur}, \code{for}, \code{poa}, \code{spo} (2017 to
+2019); \code{rio} (2018 and 2019); \code{goi}, \code{rec} (2019).\tabular{ll}{
+   \strong{City name} \tab \strong{Three-letter abbreviation} \cr
+   Belem \tab \code{bel} \cr
+   Belo Horizonte \tab \code{bho} \cr
+   Brasilia \tab \code{bsb} \cr
+   Campinas \tab \code{cam} \cr
+   Campo Grande \tab \code{cgr} \cr
+   Curitiba \tab \code{cur} \cr
+   Duque de Caxias \tab \code{duq} \cr
+   Fortaleza \tab \code{for} \cr
+   Goiania \tab \code{goi} \cr
+   Guarulhos \tab \code{gua} \cr
+   Maceio \tab \code{mac} \cr
+   Manaus \tab \code{man} \cr
+   Natal \tab \code{nat} \cr
+   Porto Alegre \tab \code{poa} \cr
+   Recife \tab \code{rec} \cr
+   Rio de Janeiro \tab \code{rio} \cr
+   Salvador \tab \code{sal} \cr
+   Sao Goncalo \tab \code{sgo} \cr
+   Sao Luis \tab \code{slz} \cr
+   Sao Paulo \tab \code{spo} \cr
 }
 
 }

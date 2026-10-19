@@ -7,7 +7,8 @@
 #' See the documentation 'Details' for the data dictionary.
 #'
 #' @template city
-#' @template showProgress
+#' @param showProgress Logical. If `TRUE`, displays a progress bar.
+#'        Defaults to `FALSE`.
 #'
 #' @return An `sf data.frame` object
 #' @details
@@ -17,7 +18,7 @@
 #' | geographic	| `id_hex`	   | Unique id of hexagonal cell	|
 #' | geographic	| `abbrev_muni`| Abbreviation of city name (3 letters)	|
 #' | geographic	| `name_muni`  | City name	|
-#' | geographic	| `code_muni`	 | 7-digit code of each city	| |
+#' | geographic	| `code_muni`	 | 7-digit code of each city	|
 #'
 #' # Cities available
 #' |**City name**| **Three-letter abbreviation**|

@@ -4,15 +4,17 @@
 #' Download population and socioeconomic data from the Brazilian Census at a fine
 #' spatial resolution for the cities included in the AOP project. See the
 #' documentation 'Details' for the data dictionary. The data set reports
-#' information for each heaxgon in a H3 spatial grid at resolution 9, with a
+#' information for each hexagon in a H3 spatial grid at resolution 9, with a
 #' side of 174 meters and an area of 0.10 km2. More information about H3 at \url{https://h3geo.org/docs/core-library/restable/}.
 #'
 #' @template city
-#' @template year
+#' @param year Numeric. Year of the census data. Only 2010 is available
+#'        (the default).
 #' @template geometry
 #' @template showProgress
 #'
-#' @return A `data.frame` object or an `sf data.frame` object
+#' @return A `data.table`, or an `sf` object (which also inherits from
+#'         `data.table`) when `geometry = TRUE`.
 #'
 #' @details
 #' # Data dictionary:
@@ -27,7 +29,7 @@
 #' | sociodemographic | P002       | Number of white residents | |
 #' | sociodemographic | P003       | Number of black residents | |
 #' | sociodemographic | P004       | Number of indigenous residents | |
-#' | sociodemographic | P005       | Number of asian-descendents residents | |
+#' | sociodemographic | P005       | Number of Asian-descendant residents | |
 #' | sociodemographic | P006       | Number of men | |
 #' | sociodemographic | P007       | Number of women | |
 #' | sociodemographic | P010       | Number of people between 0 and 5 years old | |

@@ -13,7 +13,7 @@ Authors@R: c(
 Description: Download data from the 'Access to Opportunities Project (AOP)'. The 
              'aopdata' package brings annual estimates of access to employment, 
              health, education and social assistance services by transport mode, 
-             as well as data  on the spatial distribution of population, jobs, 
+             as well as data on the spatial distribution of population, jobs, 
              health care, schools and social assistance facilities at a fine 
              spatial resolution for all cities included in the project. More 
              info on the 'AOP' website <https://www.ipea.gov.br/acessooportunidades/en/>.

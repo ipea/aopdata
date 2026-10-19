@@ -1,6 +1,6 @@
 ---
 title: 'Mapping urban accessibility'
-author: "Rafael H. M. Pereira .."
+author: "Rafael H. M. Pereira"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 urlcolor: blue
@@ -65,7 +65,7 @@ ggplot() +
   geom_sf(data=df, aes(fill=CMAET30), color=NA, alpha=.9) +
   scale_fill_viridis_c(option = "cividis", labels=scales::comma) +
     labs(title='Number of schools accessible', fill="Accessibility",
-       subtitle='by public transport in less than 30 min.', fill="N. of schools") +
+       subtitle='by public transport in less than 30 min.') +
   theme_void()
 ```
 

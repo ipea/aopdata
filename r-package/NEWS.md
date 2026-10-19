@@ -15,6 +15,8 @@
 
 **Minor changes**
 
+- Documentation corrected to match the data: the years and cities of each transport mode, the off-peak window, time thresholds, the TMI indicators, the defaults of `read_population(year)` and `read_grid(showProgress)`, and return types.
+- Typos fixed in the documentation and vignettes; the package citation (`citation("aopdata")`) now lists the two Ipea discussion papers as technical reports, with their DOIs.
 - City codes and names can now be mixed, in any capitalisation and with or without accents, in every function (e.g. `city = c('nat', 'São Paulo')`). Previously a mix returned `NULL` or a misleading error, and only `read_access()` accepted upper-case city codes and `'ALL'`.
 - Invalid inputs now give a clear error before any data is downloaded: `city` missing, `NULL`, `NA` or not text; an unknown city (the error names it and lists the valid codes and names); and a `mode` that a requested city doesn't have (the error names the city and lists the cities with that mode).
 - `peak`, `geometry` and `showProgress` must be a single `TRUE` or `FALSE`. `showProgress = 1`/`0` is no longer accepted, and `NA` or vectors give an error instead of a base R error. A vector `year` also gives a clear error; one year per call is supported.
@@ -108,7 +110,7 @@
 **Minor changes**
 
 - `read_` functions now have no default value for the `city` parameter. [Closes #38](https://github.com/ipea/aopdata/issues/38).
-- Fixed `ERROR` message when there is no data for a particular transport mode for an specific city & year.
+- Fixed `ERROR` message when there is no data for a particular transport mode for a specific city & year.
 
 
 
@@ -128,7 +130,7 @@
 
 **Minor changes**
 
-- Adds `crul` as a package dependency. Now aoptadata fails gracefully when there is internet connection problems. Closes #32.
+- Adds `crul` as a package dependency. Now aopdata fails gracefully when there is internet connection problems. Closes #32.
 - `showProgress` now sets to `FALSE` in all tests, examples and vignettes. Closes #32.
 - skip tests on CRAN. Tests are run only locally
 
