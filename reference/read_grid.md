@@ -20,7 +20,7 @@ read_grid(city = NULL, showProgress = FALSE)
 
 - showProgress:
 
-  Logical. Defaults to `TRUE` display progress bar.
+  Logical. If `TRUE`, displays a progress bar. Defaults to `FALSE`.
 
 ## Value
 

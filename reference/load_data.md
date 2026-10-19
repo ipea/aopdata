@@ -5,14 +5,15 @@ Reads data from tempdir to global environment.
 ## Usage
 
 ``` r
-load_data(temps = NULL)
+load_data(temps)
 ```
 
 ## Arguments
 
 - temps:
 
-  The address of a data file stored in tempdir. Defaults to NULL
+  The paths of one or more data files stored in tempdir, all `.csv` or
+  all `.gpkg`.
 
 ## Value
 

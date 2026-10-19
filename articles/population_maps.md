@@ -5,6 +5,7 @@ Here are a few quick examples to illustrate how you can use the
 Brazilian cities.
 
 ``` r
+
 # load libraries
 library(aopdata)
 library(data.table)
@@ -16,18 +17,19 @@ library(scales)
 ## Download population data
 
 ``` r
+
 df <- aopdata::read_population(
   city = 'Fortaleza',
   year = 2010,
   geometry = TRUE,
   showProgress = FALSE
   )
-#> Downloading population data for the year 2010
 ```
 
 ## Map total population
 
 ``` r
+
 ggplot() +
   geom_sf(data=subset(df, P001>0), aes(fill=P001), color=NA, alpha=.8) +
   scale_fill_distiller(palette = "YlOrRd", direction = 1)+
@@ -43,6 +45,7 @@ Here, we map the spatial distribution population by income decile
 (column `R003`).
 
 ``` r
+
 ggplot() +
   geom_sf(data=subset(df, !is.na(R002)), aes(fill=factor(R003)), color=NA, alpha=.8) +
   scale_fill_brewer(palette = "RdBu") +
@@ -57,6 +60,7 @@ ggplot() +
 Here, we map the spatial distribution of the black population.
 
 ``` r
+
 df$prop_black <- df$P003 / df$P001
   
 ggplot() +

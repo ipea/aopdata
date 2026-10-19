@@ -12,13 +12,13 @@
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Data from the Access to Opportunities Project (AOP)">
 <meta name="description" content="Download data from the Access to Opportunities Project (AOP). The aopdata package brings annual estimates of access to employment, health, education and social assistance services by transport mode, as well as data on the spatial distribution of population, jobs, health care, schools and social assistance facilities at a fine spatial resolution for all cities included in the project. More info on the AOP website &lt;https://www.ipea.gov.br/acessooportunidades/en/&gt;.">
 <meta property="og:description" content="Download data from the Access to Opportunities Project (AOP). The aopdata package brings annual estimates of access to employment, health, education and social assistance services by transport mode, as well as data on the spatial distribution of population, jobs, health care, schools and social assistance facilities at a fine spatial resolution for all cities included in the project. More info on the AOP website &lt;https://www.ipea.gov.br/acessooportunidades/en/&gt;.">
-<meta property="og:image" content="https://ipeagit.github.io/aopdata/logo.png">
+<meta property="og:image" content="https://ipea.github.io/aopdata/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">aopdata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/aopdata/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/aopdata/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -81,19 +81,19 @@
 
 <p><strong><code>aopdata</code></strong> is an R package to download data from the <a href="https://www.ipea.gov.br/acessooportunidades/en/" class="external-link">Access to Opportunities Project (AOP)</a>. The AOP is a research initiative led by the Institute for Applied Economic Research (Ipea) with the aim to study transport access to opportunities in Brazilian cities.</p>
 <p>The <strong><code>aopdata</code></strong> package brings annual estimates of access to employment, health, education and social protection services by transport mode at a fine spatial resolution for the 20 largest cities in Brazil. The package also brings data on the spatial distribution of population by sex, race, income and age, as well as the distribution of jobs, schools, health care facilities and social assistance reference centers.</p>
-<p>Data for 2017, 2018 and 2019 are already available, and cover accessibility estimates by car and active transport modes (walking and cycling) for the 20 largest cities in the country, and by public transport for over 9 major cities. For more information on the <a href="https://www.ipea.gov.br/acessooportunidades/en/" class="external-link">AOP website</a>.</p>
+<p>Data for 2017, 2018 and 2019 are available and cover accessibility by walking and cycling for the 20 largest cities in the country, by public transport for up to 9 of them, and by car for the 20 cities in 2019. More information is available on the <a href="https://www.ipea.gov.br/acessooportunidades/en/" class="external-link">AOP website</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From CRAN</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aopdata"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipeagit.github.io/aopdata/">aopdata</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/aopdata/">aopdata</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># or use the development version with latest features</span></span>
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/remove.packages.html" class="external-link">remove.packages</a></span><span class="op">(</span><span class="st">'aopdata'</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ipeaGIT/aopdata"</span>, subdir <span class="op">=</span> <span class="st">"r-package"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipeagit.github.io/aopdata/">aopdata</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ipea/aopdata"</span>, subdir <span class="op">=</span> <span class="st">"r-package"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/aopdata/">aopdata</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="overview-of-the-package">Overview of the package<a class="anchor" aria-label="anchor" href="#overview-of-the-package"></a>
@@ -111,12 +111,12 @@
 <li>
 <code><a href="reference/read_grid.html">read_grid()</a></code> - Download the H3 hexagonal spatial grid</li>
 </ul>
-<p>For a detailed explanations of these functions, check the <strong>vignettes</strong>:</p>
+<p>For detailed explanations of these functions, check the <strong>vignettes</strong>:</p>
 <ul>
-<li><a href="https://ipeagit.github.io/aopdata/articles/access_maps.html">Mapping urban accessibility</a></li>
-<li><a href="https://ipeagit.github.io/aopdata/articles/population_maps.html">Mapping population data</a></li>
-<li><a href="https://ipeagit.github.io/aopdata/articles/landuse_maps.html">Mapping land use data</a></li>
-<li><a href="https://ipeagit.github.io/aopdata/articles/access_inequality.html">Analyzing inequality in access to opportunities</a></li>
+<li><a href="https://ipea.github.io/aopdata/articles/access_maps.html">Mapping urban accessibility</a></li>
+<li><a href="https://ipea.github.io/aopdata/articles/population_maps.html">Mapping population data</a></li>
+<li><a href="https://ipea.github.io/aopdata/articles/landuse_maps.html">Mapping land use data</a></li>
+<li><a href="https://ipea.github.io/aopdata/articles/access_inequality.html">Analyzing inequality in access to opportunities</a></li>
 </ul>
 </div>
 <div class="section level2">
@@ -135,7 +135,7 @@
 <div class="section level3">
 <h3 id="accessibility-estimates">Accessibility estimates<a class="anchor" aria-label="anchor" href="#accessibility-estimates"></a>
 </h3>
-<p>The <code><a href="reference/read_access.html">read_access()</a></code> function downloads accessibility estimates for a given <code>city</code>, <code>mode</code> and <code>year</code>. For the sake of convenience, this function will also automatically download the population and land use data for the cities selected. Note that accessibility estimates are available for peak and off-peak periods for <code>public_transport</code>and <code>car</code> modes.</p>
+<p>The <code><a href="reference/read_access.html">read_access()</a></code> function downloads accessibility estimates for a given <code>city</code>, <code>mode</code> and <code>year</code>. For the sake of convenience, this function will also automatically download the population and land use data for the cities selected. Note that accessibility estimates are available for peak and off-peak periods for <code>public_transport</code> and <code>car</code> modes.</p>
 <pre><code><span><span class="co"># Download accessibility, population and land use data</span></span>
 <span><span class="va">cur</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_access.html">read_access</a></span><span class="op">(</span></span>
 <span>  city <span class="op">=</span> <span class="st">'Curitiba'</span>,</span>
@@ -143,7 +143,7 @@
 <span>  peak <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2019</span></span>
 <span>  <span class="op">)</span></span></code></pre>
-<p>You many also set the parameter <code>geometry = TRUE</code> so that functions return a spatial <code>sf</code> object with the geometries of the H3 spatial grid.</p>
+<p>You may also set the parameter <code>geometry = TRUE</code> so that functions return a spatial <code>sf</code> object with the geometries of the H3 spatial grid.</p>
 <pre><code><span><span class="co"># Download accessibility, population and land use data</span></span>
 <span><span class="va">cur</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_access.html">read_access</a></span><span class="op">(</span></span>
 <span>  city <span class="op">=</span> <span class="st">'Curitiba'</span>,</span>
@@ -156,7 +156,7 @@
 <div class="section level3">
 <h3 id="population-and-land-use-data">Population and land use data<a class="anchor" aria-label="anchor" href="#population-and-land-use-data"></a>
 </h3>
-<p>In case you are only interested in using the population and land use data generated by the Access to Opportunities Project, you can download these data sets separately. Please note that the population available comes from the latest Brazilian 2010 census, while land use data cna be downloaded for 2017, 2018 or 2019.</p>
+<p>In case you are only interested in using the population and land use data generated by the Access to Opportunities Project, you can download these data sets separately. Please note that the population available comes from the latest Brazilian 2010 census, while land use data can be downloaded for 2017, 2018 or 2019.</p>
 <pre><code><span><span class="co"># Land use data</span></span>
 <span><span class="va">lu_for</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_landuse.html">read_landuse</a></span><span class="op">(</span></span>
 <span>  city <span class="op">=</span> <span class="st">'Fortaleza'</span>,</span>
@@ -204,12 +204,12 @@
 <p>If you use this package in your own work, please cite it as one of the publications below:</p>
 <p><strong>Population and land use data</strong></p>
 <ul>
-<li>Pereira, Rafael H. M. et al. (2022) Distribuição espacial de características sociodemográficas e localização de empregos e serviços públicos das vinte maiores cidades do Brasil. <em>Texto para Discussão 2772</em>. Ipea - Instituto de Pesquisa Econômica Aplicada. <a href="http://dx.doi.org/10.38116/td2772" class="external-link uri">http://dx.doi.org/10.38116/td2772</a>
+<li>Pereira, Rafael H. M. et al. (2022) Distribuição espacial de características sociodemográficas e localização de empregos e serviços públicos das vinte maiores cidades do Brasil. <em>Texto para Discussão 2772</em>. Ipea - Instituto de Pesquisa Econômica Aplicada. <a href="https://doi.org/10.38116/td2772" class="external-link uri">https://doi.org/10.38116/td2772</a>
 </li>
 </ul>
 <p><strong>Accessibility data</strong></p>
 <ul>
-<li>Pereira, Rafael H. M. et al. (2022) Estimativas de acessibilidade a empregos e serviços públicos via transporte ativo, público e privado nas 20 maiores cidades do Brasil em 2017, 2018, 2019. <em>Texto para Discussão 2800</em>. Ipea - Instituto de Pesquisa Econômica Aplicada. <a href="http://dx.doi.org/10.38116/td2800" class="external-link uri">http://dx.doi.org/10.38116/td2800</a>
+<li>Pereira, Rafael H. M. et al. (2022) Estimativas de acessibilidade a empregos e serviços públicos via transporte ativo, público e privado nas 20 maiores cidades do Brasil em 2017, 2018, 2019. <em>Texto para Discussão 2800</em>. Ipea - Instituto de Pesquisa Econômica Aplicada. <a href="https://doi.org/10.38116/td2800" class="external-link uri">https://doi.org/10.38116/td2800</a>
 </li>
 </ul>
 </div>
@@ -218,8 +218,8 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=aopdata" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/ipeaGIT/aopdata/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/ipeaGIT/aopdata/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/ipea/aopdata/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ipea/aopdata/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -263,7 +263,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

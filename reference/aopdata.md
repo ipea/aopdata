@@ -11,17 +11,17 @@ for all cities included in the project. More info on the AOP website
 ## Usage
 
 Please check the vignettes on the
-[website](https://ipeagit.github.io/aopdata/).
+[website](https://ipea.github.io/aopdata/).
 
 ## See also
 
 Useful links:
 
-- <https://ipeagit.github.io/aopdata/>
+- <https://ipea.github.io/aopdata/>
 
-- <https://github.com/ipeaGIT/aopdata>
+- <https://github.com/ipea/aopdata>
 
-- Report bugs at <https://github.com/ipeaGIT/aopdata/issues>
+- Report bugs at <https://github.com/ipea/aopdata/issues>
 
 ## Author
 
@@ -29,6 +29,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0003-2125-7465))
 
 Authors:
+
+- Rafael H. M. Pereira <rafa.pereira.br@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-2125-7465))
 
 - Daniel Herszenhut <dhersz@gmail.com>
   ([ORCID](https://orcid.org/0000-0001-8066-1105))
