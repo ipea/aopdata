@@ -6,11 +6,9 @@ testthat::skip_on_cran()
 ### expected behavior ----------------
   test_that("read_population expected behavior", {
 
-    # whole file
-    expect_true(is(  read_population(city='nat', geometry = TRUE, showProgress = FALSE), 'sf'))
-    expect_true(is(  read_population(city='nat', geometry = FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_population(city='all', geometry = FALSE, showProgress = FALSE), 'data.frame'))
-
+    testthat::expect_s3_class(read_population(city='nat', geometry = TRUE, showProgress = FALSE), 'sf')
+    testthat::expect_s3_class(read_population(city='nat', geometry = FALSE, showProgress = FALSE), 'data.frame')
+    testthat::expect_s3_class(read_population(city='all', geometry = FALSE, showProgress = FALSE), 'data.frame')
   })
 
 ### expected errors and messages ----------------

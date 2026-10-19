@@ -12,7 +12,7 @@ url_error <- 'https://httpbin.org/status/300'
 
 # Expected success -----------------------------------
 
-test_that("check_connection", {
+test_that("check_connection returns TRUE for a working url", {
 
   testthat::expect_true(check_connection(url = url_ok) )
   testthat::expect_true(check_connection(url = url_ok, silent = TRUE) )
@@ -20,7 +20,7 @@ test_that("check_connection", {
 
 
 # Expected errors to fail gracefully -----------------------------------
-test_that("check_connection", {
+test_that("check_connection fails gracefully", {
 
   # broken link / non-existent
   testthat::expect_message( check_connection(url = "banana") )

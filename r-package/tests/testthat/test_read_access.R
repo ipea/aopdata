@@ -6,40 +6,38 @@ testthat::skip_on_cran()
 ### expected behavior ----------------
   test_that("read_access expected behavior", {
 
-    # whole file
-    # testthat::expect_output(object = read_access(city='nat', year=2019))
-    # testthat::expect_output(object = read_access(city='nat', geometry = TRUE))
-
-    expect_true(is(  read_access(city='all', geometry = FALSE, peak=FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='nat', geometry = TRUE, showProgress = FALSE), 'sf'))
-    expect_true(is(  read_access(city='nat', geometry = FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='nat', geometry = FALSE, peak=FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='nat', geometry = FALSE, peak=FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='nat', geometry = FALSE, mode='car', peak=FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='poa', geometry = FALSE, mode='public_transport', peak=FALSE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE), 'data.frame'))
-    expect_true(is(  read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE, year=2018), 'data.frame'))
-    expect_true(is(  read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE, year=2017), 'data.frame'))
-    expect_true(is(  read_access(city='porto alegre', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE), 'data.frame'))
+    testthat::expect_s3_class(read_access(city='all', geometry = FALSE, peak=FALSE, showProgress = FALSE), 'data.frame')
+    testthat::expect_s3_class(read_access(city='nat', geometry = TRUE, showProgress = FALSE), 'sf')
+    testthat::expect_s3_class(read_access(city='nat', geometry = FALSE, showProgress = FALSE), 'data.frame')
+    testthat::expect_s3_class(read_access(city='nat', geometry = FALSE, peak=FALSE, showProgress = FALSE), 'data.frame')
+    car <- read_access(city='nat', geometry = FALSE, mode='car', peak=FALSE, showProgress = FALSE)
+    testthat::expect_s3_class(car, 'data.frame')
+    testthat::expect_gt(nrow(car), 0)
+    testthat::expect_true(all(car$peak[!is.na(car$peak)] == 0))
+    testthat::expect_true(all(car$mode[!is.na(car$mode)] == 'car'))
+    testthat::expect_s3_class(read_access(city='poa', geometry = FALSE, mode='public_transport', peak=FALSE, showProgress = FALSE), 'data.frame')
+    pt <- read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE)
+    testthat::expect_s3_class(pt, 'data.frame')
+    testthat::expect_gt(nrow(pt), 0)
+    testthat::expect_true(all(pt$peak[!is.na(pt$peak)] == 1))
+    testthat::expect_s3_class(read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE, year=2018), 'data.frame')
+    testthat::expect_s3_class(read_access(city='poa', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE, year=2017), 'data.frame')
+    testthat::expect_s3_class(read_access(city='porto alegre', geometry = FALSE, mode='public_transport', peak=TRUE, showProgress = FALSE), 'data.frame')
   })
 
 
 test_that("read_access expected behavior multiple cities", {
 
-  # whole file
-  # testthat::expect_output(object = read_access(city='nat', year=2019))
-  # testthat::expect_output(object = read_access(city='nat', geometry = TRUE))
-
   test_walk <- read_access(city=c('nat', 'for'), mode= 'walk', geometry = FALSE, showProgress = FALSE)
-  test_walk <- subset(test_walk, !is.na(mode))
-  expect_true(is(  test_walk, 'data.frame'))
+  testthat::expect_s3_class(test_walk, 'data.frame')
+  test_walk <- test_walk[!is.na(test_walk$mode), ]
   expect_equal(  length(unique(test_walk$abbrev_muni)) , 2)
   expect_equal(  unique(test_walk$mode) , 'walk')
 
 
   test_pt <- read_access(city=c('rec', 'for'), mode= 'public_transport', geometry = FALSE, showProgress = FALSE)
-  test_pt <- subset(test_pt, !is.na(mode))
-  expect_true(is(  test_pt, 'data.frame'))
+  testthat::expect_s3_class(test_pt, 'data.frame')
+  test_pt <- test_pt[!is.na(test_pt$mode), ]
   expect_equal(  length(unique(test_pt$abbrev_muni)) , 2)
   expect_equal(  unique(test_pt$mode) , 'public_transport')
 

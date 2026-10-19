@@ -6,35 +6,6 @@ testthat::skip_on_cran()
 
 
 
-# ### download metadata ----------------
-#
-# testthat::test_that("gracefully fail if could not download metadata", {
-#
-#   # meta data
-#   testthat::local_mocked_bindings(
-#     check_connection = function(...) { FALSE }
-#   )
-#   testthat::expect_null( download_metadata() )
-# })
-#
-
-
-### check connection ----------------
-# url <- 'https://www.google.com:81/'   # timeout
-# url <- 'https://httpbin.org/status/300' # error
-
-testthat::test_that("check connection", {
-
-  # timeout
-  testthat::expect_false( check_connection(url = 'https://www.google.com:81/') )
-
-  # connection error
-  testthat::expect_false( check_connection(url = 'https://httpbin.org/status/300') )
-
-
-})
-
-
 ### checkmate text with braces ----------------
 
 testthat::test_that("abort_if_invalid handles braces in checkmate messages", {
@@ -391,4 +362,81 @@ testthat::test_that("select_metadata checks that every city has the mode", {
   # a vector year
   testthat::expect_error(select_metadata("access", "nat", c(2017, 2019), "walk"),
                          class = "aopdata_error")
+})
+
+
+### load_data, aop_merge and aop_spatial_join (offline fixtures) ----------------
+
+# two small geopackages with the grid keys: h1 and h2 in the first, h3 in the second
+write_grid_fixture <- function() {
+  grid <- function(ids, xs) {
+    sf::st_sf(
+      id_hex = ids, abbrev_muni = "nat", name_muni = "natal", code_muni = 2408102,
+      geom = sf::st_sfc(lapply(xs, function(x) sf::st_point(c(x, 0))), crs = 4326)
+    )
+  }
+  paths <- c(tempfile("aoptest_load_", fileext = ".gpkg"),
+             tempfile("aoptest_load_", fileext = ".gpkg"))
+  sf::st_write(grid(c("h1", "h2"), c(1, 2)), paths[1], quiet = TRUE)
+  sf::st_write(grid("h3", 101), paths[2], quiet = TRUE)
+  paths
+}
+
+testthat::test_that("load_data reads one or several geopackages", {
+  gpkg <- write_grid_fixture()
+  on.exit(unlink(gpkg), add = TRUE)
+
+  one <- load_data(gpkg[1])
+  testthat::expect_s3_class(one, "sf")
+  testthat::expect_equal(sort(one$id_hex), c("h1", "h2"))
+
+  both <- load_data(gpkg)
+  testthat::expect_s3_class(both, "sf")
+  testthat::expect_equal(sort(both$id_hex), c("h1", "h2", "h3"))
+  testthat::expect_equal(sf::st_crs(both)$epsg, 4326L)
+  # the bbox of a multi-file result is a known bug (backlog); not asserted
+})
+
+testthat::test_that("load_data returns NULL with one message for a file with no rows", {
+  csv <- tempfile("aoptest_load_", fileext = ".csv")
+  on.exit(unlink(csv), add = TRUE)
+  writeLines("id_hex,abbrev_muni", csv)
+  testthat::expect_equal(count_network_msgs(out <- load_data(csv)), 1)
+  testthat::expect_null(out)
+})
+
+testthat::test_that("aop_spatial_join attaches the grid geometry by id_hex", {
+  gpkg <- write_grid_fixture()
+  on.exit(unlink(gpkg), add = TRUE)
+  grid <- load_data(gpkg)
+  ref <- stats::setNames(sf::st_as_text(sf::st_geometry(grid)), grid$id_hex)
+
+  # h1 and h3 match (one from each file), h9 has no grid hexagon, 'a' is dropped;
+  # h2 is only in the grid
+  df <- data.frame(id_hex = c("a", "h1", "h3", "h9"), abbrev_muni = "nat",
+                   name_muni = "natal", code_muni = 2408102, P001 = 1:4)
+  out <- aop_spatial_join(df, grid)
+
+  testthat::expect_s3_class(out, "sf")
+  testthat::expect_equal(sf::st_crs(out)$epsg, 4326L)
+  testthat::expect_equal(sort(out$id_hex), c("h1", "h3", "h9"))
+  testthat::expect_true(sf::st_is_empty(out[out$id_hex == "h9", ]))
+  matched <- out$id_hex %in% c("h1", "h3")
+  testthat::expect_equal(sf::st_as_text(sf::st_geometry(out)[matched]),
+                         unname(ref[out$id_hex[matched]]))
+})
+
+testthat::test_that("aop_merge keeps every hexagon of both tables", {
+  keys <- function(ids) data.frame(id_hex = ids, abbrev_muni = "nat",
+                                   name_muni = "natal", code_muni = 2408102,
+                                   year = 2019)
+  landuse <- cbind(keys(c("h1", "h2", "h3")), P001 = 1:3)
+  access <- cbind(keys(c("h2", "h3", "h4")), mode = "walk", peak = 1,
+                  CMATT30 = 1:3)
+  out <- aop_merge(landuse, access)
+
+  testthat::expect_equal(nrow(out), 4)
+  testthat::expect_equal(sort(out$id_hex), c("h1", "h2", "h3", "h4"))
+  testthat::expect_true(is.na(out$mode[out$id_hex == "h1"]))
+  testthat::expect_equal(anyDuplicated(names(out)), 0)
 })
