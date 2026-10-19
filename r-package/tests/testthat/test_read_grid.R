@@ -40,20 +40,20 @@ testthat::test_that("gracefully fail if could not download metadata", {
 
   # meta data
   testthat::local_mocked_bindings(
-    select_metadata = function(...) { NULL }
+    select_metadata = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_grid(city='nat') )
-  testthat::expect_message( read_grid(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_grid(city='nat')), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    download_data = function(...) { NULL }
+    download_data = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_grid(city='nat') )
-  testthat::expect_message( read_grid(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_grid(city='nat')), 1 )
 })
 
 

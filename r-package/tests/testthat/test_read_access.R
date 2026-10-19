@@ -81,30 +81,30 @@ testthat::test_that("gracefully fail if could not download metadata", {
 
   # meta data
   testthat::local_mocked_bindings(
-    select_metadata = function(...) { NULL }
+    select_metadata = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_access(city='nat') )
-  testthat::expect_message( read_access(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_access(city='nat')), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    download_data = function(...) { NULL }
+    download_data = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_access(city='nat') )
-  testthat::expect_message( read_access(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_access(city='nat')), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download grid data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    read_grid = function(...) { NULL }
+    read_grid = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_access(city='nat', geometry = TRUE) )
-  testthat::expect_message( read_access(city='nat', geometry = TRUE) )
+  testthat::expect_equal( count_network_msgs(read_access(city='nat', geometry = TRUE)), 1 )
 })
 
 
@@ -112,9 +112,27 @@ testthat::test_that("gracefully fail if could not download land use data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    read_landuse = function(...) { NULL }
+    read_landuse = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_access(city='nat') )
-  testthat::expect_message( read_access(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_access(city='nat')), 1 )
 })
 
+
+testthat::test_that("a failed nested download gives exactly one message", {
+  real_download_data <- download_data
+  testthat::local_mocked_bindings(
+    download_data = function(url, ...) {
+      if (any(grepl("population", url))) {
+        inform_failure("offline")
+        return(invisible(NULL))
+      }
+      real_download_data(url, ...)
+    }
+  )
+  testthat::expect_equal(
+    count_network_msgs(out <- read_access(city = 'nat', showProgress = FALSE)),
+    1
+  )
+  testthat::expect_null(out)
+})

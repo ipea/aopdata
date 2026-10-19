@@ -168,7 +168,6 @@ read_access <- function(city = NULL,
                                m=mode)
 
   # check if download failed
-  check_downloaded_obj(temp_meta) # nocov
   if (is.null(temp_meta)) { return(invisible(NULL)) }
 
   if (isTRUE(showProgress)) {
@@ -213,7 +212,6 @@ read_access <- function(city = NULL,
   aop_access <- download_data(url = file_url, progress_bar = showProgress)
 
   # check if download failed
-  check_downloaded_obj(aop_access) # nocov
   if (is.null(aop_access)) { return(invisible(NULL)) }
 
   # peak Vs off-peak
@@ -228,7 +226,6 @@ read_access <- function(city = NULL,
   aop_landuse <- read_landuse(city=city, year=year, showProgress=showProgress)
 
   # check if download failed
-  check_downloaded_obj(aop_landuse) # nocov
   if (is.null(aop_landuse)) { return(invisible(NULL)) }
 
   # merge
@@ -241,12 +238,9 @@ read_access <- function(city = NULL,
 
     } else {
       # return sf
-      aop_grid <- suppressMessages(
-        read_grid(city = city, showProgress = showProgress)
-      )
+      aop_grid <- read_grid(city = city, showProgress = showProgress)
 
       # check if download failed
-      check_downloaded_obj(aop_grid) # nocov
       if (is.null(aop_grid)) { return(invisible(NULL)) }
 
       aop_sf <- aop_spatial_join(aop, aop_grid)

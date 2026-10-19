@@ -10,6 +10,7 @@
 - HTTP errors (e.g. 404 pages) are no longer saved and read as data.
 - Interrupted or corrupted downloads are no longer reused from the session cache: files are saved only once they are complete, and a cached file that can't be read is removed.
 - Downloads that stall are now stopped instead of hanging the R session.
+- When a download fails, the user now sees one message that says what failed. Previously the functions could print "No internet connection." up to three times, even when only one file was unavailable.
 
 **Minor changes**
 

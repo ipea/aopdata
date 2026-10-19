@@ -31,9 +31,6 @@ testthat::test_that("check connection", {
   # connection error
   testthat::expect_false( check_connection(url = 'https://httpbin.org/status/300') )
 
-  # check_downloaded_obj
-  testthat::expect_null( check_downloaded_obj(NULL) )
-  testthat::expect_message( check_downloaded_obj(NULL), class = "aopdata_network")
 
 })
 

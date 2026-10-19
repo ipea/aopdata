@@ -39,38 +39,38 @@ testthat::test_that("gracefully fail if could not download metadata", {
 
   # meta data
   testthat::local_mocked_bindings(
-    select_metadata = function(...) { NULL }
+    select_metadata = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_landuse(city='nat') )
-  testthat::expect_message( read_landuse(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_landuse(city='nat')), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    download_data = function(...) { NULL }
+    download_data = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_landuse(city='nat') )
-  testthat::expect_message( read_landuse(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_landuse(city='nat')), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download grid data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    read_grid = function(...) { NULL }
+    read_grid = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_landuse(city='nat', geometry = TRUE) )
-  testthat::expect_message( read_landuse(city='nat', geometry = TRUE) )
+  testthat::expect_equal( count_network_msgs(read_landuse(city='nat', geometry = TRUE)), 1 )
 })
 
 testthat::test_that("gracefully fail if could not download population data", {
 
   # meta data
   testthat::local_mocked_bindings(
-    read_population = function(...) { NULL }
+    read_population = function(...) { inform_failure("offline"); NULL }
   )
   testthat::expect_null( read_landuse(city='nat') )
-  testthat::expect_message( read_landuse(city='nat') )
+  testthat::expect_equal( count_network_msgs(read_landuse(city='nat')), 1 )
 })

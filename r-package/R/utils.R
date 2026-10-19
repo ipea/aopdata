@@ -550,25 +550,6 @@ check_connection <- function(url = 'https://www.ipea.gov.br/geobr/aopdata/metada
 
 
 
-
-#' Check if object has been downloaded/created in global environment
-#'
-#' @param obj Any type of object
-#'
-#' @return Returns `NULL` with an informative message
-#' @keywords internal
-#'
-check_downloaded_obj <- function(obj){
-
-  if (is.null(obj)) {
-    inform_failure("No internet connection.")
-    return(invisible(NULL))
-    }
-}
-
-
-
-
 #' Throw an aopdata error when a checkmate check fails
 #'
 #' @param check Result of a `checkmate::check_*()` call: `TRUE` or a string.

@@ -25,7 +25,7 @@ download_metadata <- function(){ # nocov start
     if (is.null(check_con) | isFALSE(check_con)) {
       metadata_link <- 'https://www.ipea.gov.br/geobr/aopdata/metadata/metadata.csv'
       try( silent = TRUE,
-           check_con <- check_connection(metadata_link, silent = TRUE)
+           check_con <- check_connection(metadata_link, silent = FALSE)
            )
 
       if (is.null(check_con) | isFALSE(check_con)) { return(invisible(NULL)) }
