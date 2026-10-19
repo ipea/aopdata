@@ -33,7 +33,7 @@ All paths below are relative to `r-package/`.
 - **Always call `package::function()`**: `data.table::`, `checkmate::`,
   `curl::`, `sf::`, `cli::`, `utils::`.
 - **Exceptions:** the `@importFrom` set in `R/aopdata.R` — `data.table`
-  `setDT`, `:=`, `%like%`; `utils` `globalVariables`, `head`, `tail`;
+  `setDT`, `:=`, `%like%`; `utils` `globalVariables`;
   `methods` `is`. Base `subset()` is used throughout the read functions; keep it
   where it is.
 - ggplot2 functions in vignettes and README, after `library(ggplot2)`.
@@ -100,15 +100,21 @@ This is the package's most important invariant.
   `download_data()` or another reader checks `is.null()` and returns
   `invisible(NULL)` immediately. A missing check turns a graceful failure into
   an obscure error further down (e.g. `subset()` on `NULL`).
-- `check_connection()` is the only place that probes a URL; it is silenced with
-  `silent = TRUE` in internal calls so the user sees one message, not several
-  (NEWS 1.1.2).
+- **Data files:** `aop_fetch()` (`R/utils.R`, httr2, parallel) is the only
+  function that downloads them; `download_data()` calls it for the Ipea URLs,
+  then again for the GitHub mirror for the files that failed. Results are
+  classified per file by `classify_resp()` (`ok` / `http_error` /
+  `conn_error` / `aborted`); an abort never triggers the mirror.
+  `check_connection()` (curl) is still used by `download_metadata()` and
+  `aopdata_dictionary()`, with `silent = TRUE` in internal calls.
 - **Mirrors:** `metadata.csv` comes from the GitHub release `v1.0.0` first and
   the Ipea server (`www.ipea.gov.br/geobr/aopdata/`) as fallback. Data files
   come from the Ipea URL in `metadata$download_path2` first, with the GitHub
   release `v1.0.0` as fallback. Keep both mirrors working; never hardcode a
   single server.
-- **Cache:** downloads go to `tempdir()` only (session cache, `resume = TRUE`).
+- **Cache:** downloads go to `tempdir()` only (session cache). Files are
+  written to `<file>.part` and renamed only when complete; a cached file that
+  can't be read is deleted. No `resume`.
   Nothing is written outside `tempdir()`. **[NEW]** a persistent cache
   (`tools::R_user_dir()`) would be a user-facing change and needs a plan.
 - Network code is wrapped in `# nocov start` / `# nocov end` or `# nocov`.
@@ -183,11 +189,12 @@ This is the package's most important invariant.
 - **New or modified readers need at least:**
   - expected class with `geometry = FALSE` and `TRUE`
   - errors for invalid `city`, `year`, `mode` and argument types
-  - **graceful offline failure**: mock the network and expect `NULL`, e.g.
-    `testthat::local_mocked_bindings(check_connection = function(...) FALSE)`
-    then `expect_null(read_x(...))` (needs testthat ≥ 3.1.7; check that the
-    mock reaches the code path — a cached `metadata.csv` in `tempdir()` can
-    bypass it)
+  - **graceful offline failure**: mock `download_data` / `select_metadata`
+    (readers) or `aop_fetch` (download logic; the mock writes fixture files to
+    `paths` and returns statuses) and expect `NULL` plus an
+    `aopdata_network` message. Mocking `check_connection` no longer reaches
+    `download_data()`. Fixture files use fake basenames (`aoptest_*`) so they
+    can't poison the shared `tempdir()` cache. Needs testthat ≥ 3.1.7.
 - Real-network tests also need `testthat::skip_if_offline()` when added.
 - `tests/tests_rafa/` is the maintainer's scratch; leave it alone.
 

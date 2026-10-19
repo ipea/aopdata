@@ -22,12 +22,13 @@ BugReports: https://github.com/ipea/aopdata/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Imports:
       cli (>= 3.0.0),
       checkmate,
       curl (>= 5.0.0),
       data.table,
+      httr2 (>= 1.2.0),
       methods,
       rlang (>= 1.0.0),
       sf (>= 0.9-3),

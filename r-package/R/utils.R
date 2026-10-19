@@ -193,14 +193,16 @@ select_metadata <- function(t=NULL, c=NULL, y=NULL, m=NULL){
 
 #' Download data to a temporary directory.
 #'
-#' @description Save requested data (either an `sf` or a `data.frame`)
-#'              to a temporary directory.
+#' @description Downloads the requested files to a temporary directory (the
+#'              session cache) and reads them. Each file is downloaded from
+#'              the Ipea server first and, if that fails, from the GitHub
+#'              release mirror.
 #'
 #' @param url A string with the url address of aop dataset
 #' @param progress_bar Logical. Defaults to (TRUE) display progress bar
 #'
-#' @return No visible output. The downloaded file (either an `sf` or a
-#'         `data.frame`) is saved to a temporary directory.
+#' @return An `sf` or a `data.frame`, or `NULL` (with a message) if any file
+#'         could not be downloaded or read.
 #' @keywords internal
 #'
 download_data <- function(url, progress_bar = showProgress){
@@ -213,45 +215,164 @@ download_data <- function(url, progress_bar = showProgress){
     )
     }
 
-  # get backup links
-  filenames <- basename(url)
-  url2 <- paste0('https://github.com/ipea/aopdata/releases/download/v1.0.0/', filenames)
+  # dest files in the session cache, and partial files while downloading
+  dest <- file.path(tempdir(), basename(url))
+  part <- paste0(dest, ".part")
+  on.exit(unlink(part[file.exists(part)]), add = TRUE)
 
-  # test connection with server1
-  try( silent = TRUE, check_con <- check_connection(url[1], silent = TRUE))
+  # backup links
+  mirror <- paste0('https://github.com/ipea/aopdata/releases/download/v1.0.0/',
+                   basename(url))
+  sources <- list(url, mirror)
+  labels <- c("Downloading files", "Downloading files (mirror)")
 
-  # if server1 fails, replace url and test connection with server2
-  if (is.null(check_con) | isFALSE(check_con)) {
-      url <- url2
-      try( silent = TRUE, check_con <- check_connection(url[1], silent = TRUE))
-      if (is.null(check_con) | isFALSE(check_con)) { return(invisible(NULL)) }
+  # files already downloaded in this session are not downloaded again
+  status <- ifelse(file.exists(dest) & file.size(dest) > 0, "ok", "pending")
+
+  # try the Ipea server, then the mirror for the files that failed
+  for (k in seq_along(sources)) {
+    pending <- status != "ok"
+    if (!any(pending)) { break }
+
+    status[pending] <- aop_fetch(sources[[k]][pending], part[pending],
+                                 progress = progress_bar, label = labels[k])
+
+    # the user interrupted the download
+    if (any(status == "aborted")) { return(invisible(NULL)) }
+
+    # move complete downloads into the cache
+    done <- pending & status == "ok"
+    moved <- suppressWarnings(file.rename(part[done], dest[done]))
+    status[done] <- ifelse(moved, "ok", "http_error")
   }
 
-  # dest files
-  temps <- paste0(tempdir(),"/", unlist(lapply(strsplit(url,"/"),tail,n=1L)))
-
-  # download files
-  try(silent = TRUE,
-      downloaded_files <- curl::multi_download(
-        urls = url,
-        destfiles = temps,
-        progress = progress_bar,
-        resume = TRUE
-      )
-  )
-
   # if anything fails, return NULL
-  if (any(!downloaded_files$success | is.na(downloaded_files$success))) {
-    msg <- "File cached locally seems to be corrupted. Please download it again."
+  if (any(status != "ok")) {
+    msg <- paste("Could not download the data from the Ipea server or its",
+                 "GitHub mirror. Please try again later.")
     inform_failure(msg)
     return(invisible(NULL))
   }
 
-  # load data
-  temp_data <- load_data(temps)
+  # load data; a file that can't be read is removed from the cache
+  temp_data <- tryCatch(suppressMessages(load_data(dest)),
+                        error = function(e) NULL)
+
+  if (is.null(temp_data)) {
+    unlink(dest)
+    inform_failure("The downloaded data could not be read. Please try again.")
+    return(invisible(NULL))
+  }
+
   return(temp_data)
 
 }
+
+
+
+
+#' Build a download request
+#'
+#' @param url A string with the url address of a file.
+#'
+#' @return An `httr2_request`. curl's 10 s connect timeout is kept, a
+#'         transfer slower than 1 kB/s for 30 s is aborted, and nothing is
+#'         retried automatically (the mirror is the retry).
+#' @keywords internal
+#'
+aop_request <- function(url) {
+  req <- httr2::request(url)
+  req <- httr2::req_user_agent(req, "aopdata (https://github.com/ipea/aopdata)")
+  req <- httr2::req_options(req, connecttimeout = 10,
+                            low_speed_limit = 1024, low_speed_time = 30)
+
+  # httr2 retries 429/503 responses in parallel mode without a limit
+  req <- httr2::req_retry(req, max_tries = 1,
+                          is_transient = function(resp) FALSE)
+  return(req)
+}
+
+
+
+
+#' Classify the result of one download
+#'
+#' @param x A response, an error condition, or `NULL` (request never ran).
+#'
+#' @return One of `"ok"`, `"http_error"`, `"conn_error"` or `"aborted"`.
+#' @keywords internal
+#'
+classify_resp <- function(x) {
+
+  # the request never ran because the user interrupted the download
+  if (is.null(x)) { return("aborted") }
+
+  if (inherits(x, "httr2_response")) {
+    status <- httr2::resp_status(x)
+    if (status < 200 || status >= 300) { return("http_error") }
+
+    # an HTML page served with status 200 is not data
+    type <- tolower(httr2::resp_content_type(x))
+    if (isTRUE(startsWith(type, "text/html"))) { return("http_error") }
+
+    return("ok")
+  }
+
+  if (inherits(x, "httr2_http")) { return("http_error") }
+
+  return("conn_error")
+}
+
+
+
+
+#' Download files in parallel
+#'
+#' @description The only function in the package that downloads data files.
+#'
+#' @param urls Character. Urls of the files.
+#' @param paths Character. Where to save each file.
+#' @param progress Logical. Show a progress bar.
+#' @param label Character. Name of the progress bar.
+#'
+#' @return A character vector with one status per file (see `classify_resp()`).
+#' @keywords internal
+#'
+aop_fetch <- function(urls, paths, progress = FALSE,
+                      label = "Downloading files") { # nocov start
+
+  if (!length(urls)) { return(character(0)) }
+
+  reqs <- lapply(urls, aop_request)
+
+  # after Ctrl+C, httr2 lets the active requests finish and says so
+  # (not detected if cli.default_handler is set; then the mirror may be tried)
+  interrupted <- FALSE
+  resps <- tryCatch(
+    withCallingHandlers(
+      httr2::req_perform_parallel(
+        reqs,
+        paths = paths,
+        on_error = "continue",
+        progress = if (isTRUE(progress)) label else FALSE,
+        max_active = min(length(reqs), 10)
+      ),
+      message = function(m) {
+        if (grepl("Terminating iteration", conditionMessage(m), fixed = TRUE)) {
+          interrupted <<- TRUE
+        }
+      }
+    ),
+    error = function(e) NULL
+  )
+
+  if (interrupted) { return(rep("aborted", length(urls))) }
+
+  # an error in the download machinery itself (not the network)
+  if (is.null(resps)) { return(rep("http_error", length(urls))) }
+
+  return(vapply(resps, classify_resp, character(1)))
+} # nocov end
 
 
 

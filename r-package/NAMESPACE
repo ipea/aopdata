@@ -11,8 +11,4 @@ importFrom(data.table,
   setDT
 )
 importFrom(methods,is)
-importFrom(utils,
-  globalVariables,
-  head,
-  tail
-)
+importFrom(utils,globalVariables)

@@ -1,5 +1,16 @@
 # aopdata (development version)
 
+**Major changes**
+
+- Data files are now downloaded with {httr2}. If a file can't be downloaded from the Ipea server, that file is downloaded from the GitHub mirror, so a single unavailable file or server no longer makes the whole request fail. The progress bar now counts files rather than bytes.
+- aopdata now requires R >= 4.1.0 (a requirement of {httr2}).
+
+**Bug fixes**
+
+- HTTP errors (e.g. 404 pages) are no longer saved and read as data.
+- Interrupted or corrupted downloads are no longer reused from the session cache: files are saved only once they are complete, and a cached file that can't be read is removed.
+- Downloads that stall are now stopped instead of hanging the R session.
+
 **Minor changes**
 
 - All messages and errors now use {cli}. Errors have the condition class `aopdata_error`, and messages about failed downloads have the class `aopdata_network`, so they can be caught with `tryCatch()` or `withCallingHandlers()`. Download failure messages are now `rlang_message`s (previously `cliMessage`). The wording of the errors for invalid arguments, `mode` and `showProgress` changed, so match on the condition class rather than on the message text.

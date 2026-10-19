@@ -73,8 +73,9 @@ aopdata/                          # git root
 
 Data flow: `select_metadata(t, c, y, m)` reads `metadata.csv` (GitHub release
 `v1.0.0` first, Ipea server fallback) and returns the file URLs →
-`download_data()` tests the Ipea server and falls back to the GitHub release →
-`curl::multi_download()` into `tempdir()` (session cache) → `load_data()` reads
+`download_data()` downloads each file with httr2 (`aop_fetch()`, parallel) from
+the Ipea server, retries failed files from the GitHub release, and saves them
+to `tempdir()` (session cache, `.part` then rename) → `load_data()` reads
 `.csv` with `data.table::fread()` or `.gpkg` with `sf::st_read()`.
 
 Local-only workflow files (gitignored): `MEMORY.md`, `quality_reports/`,

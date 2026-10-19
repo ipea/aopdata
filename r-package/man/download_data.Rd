@@ -12,11 +12,13 @@ download_data(url, progress_bar = showProgress)
 \item{progress_bar}{Logical. Defaults to (TRUE) display progress bar}
 }
 \value{
-No visible output. The downloaded file (either an \code{sf} or a
-\code{data.frame}) is saved to a temporary directory.
+An \code{sf} or a \code{data.frame}, or \code{NULL} (with a message) if any file
+could not be downloaded or read.
 }
 \description{
-Save requested data (either an \code{sf} or a \code{data.frame})
-to a temporary directory.
+Downloads the requested files to a temporary directory (the
+session cache) and reads them. Each file is downloaded from
+the Ipea server first and, if that fails, from the GitHub
+release mirror.
 }
 \keyword{internal}

@@ -15,7 +15,7 @@
 #' @aliases aopdata-package
 #'
 #' @importFrom data.table setDT := %like%
-#' @importFrom utils globalVariables head tail
+#' @importFrom utils globalVariables
 #' @importFrom methods is
 #' @keywords internal
 "_PACKAGE"
