@@ -1,5 +1,5 @@
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     paths:
@@ -16,6 +16,8 @@ on:
 
 name: R-CMD-check
 
+permissions: read-all
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -26,24 +28,28 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - {os: windows-latest, r: 'release'}
-        - {os: macOS-latest, r: 'release'}
-        - {os: ubuntu-22.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
-        - {os: ubuntu-22.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
-        - {os: ubuntu-22.04, r: 'oldrel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,  r: 'release'}
+          - {os: ubuntu-latest,  r: 'oldrel-1'}
 
     env:
-      RSPM: ${{ matrix.config.rspm }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      # run the test suite (every test file has skip_on_cran()); the CRAN
+      # simulation lives in R-CMD-check-CRAN.yaml
+      NOT_CRAN: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
-
-      - uses: r-lib/actions/setup-pandoc@v2
+          http-user-agent: ${{ matrix.config.http-user-agent }}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -54,3 +60,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: r-package
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'

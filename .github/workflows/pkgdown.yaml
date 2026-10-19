@@ -1,3 +1,5 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches:
@@ -5,22 +7,31 @@ on:
     paths:
       - r-package/**
       - .github/workflows/pkgdown.yaml
+  # rebuild the site by hand, e.g. after a data server was down during a build
+  workflow_dispatch:
 
 name: pkgdown
 
+permissions: read-all
+
 jobs:
   pkgdown:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    # never run two deploys at the same time
+    concurrency:
+      group: pkgdown-${{ github.ref }}
     env:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      # build the articles with data (maps), see vignettes' setup chunks
       NOT_CRAN: true
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-r@v2
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
