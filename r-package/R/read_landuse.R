@@ -109,7 +109,8 @@ read_landuse <- function(city = NULL,
                          showProgress = TRUE){
 
   # checks
-  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
+  abort_if_invalid(checkmate::check_flag(geometry), "geometry")
+  abort_if_invalid(checkmate::check_flag(showProgress), "showProgress")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t='land_use',

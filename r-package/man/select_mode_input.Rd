@@ -4,12 +4,22 @@
 \alias{select_mode_input}
 \title{Select mode input}
 \usage{
-select_mode_input(temp_meta = temp_meta, mode = NULL)
+select_mode_input(
+  temp_meta = temp_meta,
+  mode = NULL,
+  all_cities = FALSE,
+  year_meta = temp_meta
+)
 }
 \arguments{
 \item{temp_meta}{A data.frame with the url addresses of aop datasets}
 
 \item{mode}{Transport mode (passed by read_ function)}
+
+\item{all_cities}{Logical. \code{TRUE} if the user asked for all cities.}
+
+\item{year_meta}{The metadata of the selected type and year, before the
+city filter. Used to find the cities with this mode.}
 }
 \value{
 A \code{data.frame} object with metadata subsetted by 'mode'

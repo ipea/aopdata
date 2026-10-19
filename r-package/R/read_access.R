@@ -143,23 +143,9 @@ read_access <- function(city = NULL,
                         showProgress = TRUE){
 
   # checks
-  abort_if_invalid(checkmate::check_logical(peak), "peak")
-  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
-
-  # remove accents
-  city <- tolower(city)
-  city <- base::iconv(city, to="ASCII//TRANSLIT")
-
-  # all cities with public transport
-  if(any(city=='all') & mode == 'public_transport' & year==2019){
-    city <- c('for', 'rec', 'bho', 'rio', 'spo', 'cur', 'poa', 'goi', 'cam')
-    }
-  if(any(city=='all') & mode == 'public_transport' & year==2018){
-    city <- c('for', 'bho', 'rio', 'spo', 'cur', 'poa', 'cam')
-  }
-  if(any(city=='all') & mode == 'public_transport' & year==2017){
-    city <- c('for', 'bho', 'spo', 'cur', 'poa', 'cam')
-    }
+  abort_if_invalid(checkmate::check_flag(peak), "peak")
+  abort_if_invalid(checkmate::check_flag(geometry), "geometry")
+  abort_if_invalid(checkmate::check_flag(showProgress), "showProgress")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t='access',
@@ -170,40 +156,13 @@ read_access <- function(city = NULL,
   # check if download failed
   if (is.null(temp_meta)) { return(invisible(NULL)) }
 
+  # cities of the request that have this mode (codes)
+  city <- unique(temp_meta$city)
+
   if (isTRUE(showProgress)) {
     cli::cli_inform("Downloading accessibility data for the year {year}")
   }
 
-
-  # cities with public transport
-  if(year==2019){
-  cities_with_pt <- c('for', 'rec', 'bho', 'rio', 'spo', 'cur', 'poa', 'goi', 'cam',
-                           'fortaleza', 'recife', 'belo horizonte',
-                           'rio de janeiro', 'sao paulo', 'curitiba',
-                           'porto alegre', 'goiania', 'campinas')
-  }
-  if(year==2018){
-  cities_with_pt <- c('for', 'bho', 'rio', 'spo', 'cur', 'poa', 'cam',
-                           'fortaleza', 'belo horizonte', 'rio de janeiro',
-                           'sao paulo', 'curitiba', 'porto alegre', 'campinas')
-  }
-  if(year==2017){
-  cities_with_pt <- c('for', 'bho', 'spo', 'cur', 'poa', 'cam',
-                           'fortaleza', 'belo horizonte', 'sao paulo',
-                           'curitiba', 'porto alegre', 'campinas')}
-
-  # check cities with public transport data
-  cities_with_pt_check <- all(city %in% cities_with_pt )
-
-  if (isFALSE(cities_with_pt_check) & mode == 'public_transport') {
-    cities_available <- paste(cities_with_pt, collapse = ", ")
-    error_msg <- "The only cities with public transport data in {year} are: {cities_available}."
-    cli::cli_abort(error_msg, class = "aopdata_error")
-    }
-
-  if (any(city == 'all') & mode=='public_transport') {
-    temp_meta <- subset(temp_meta, city %in% cities_with_pt)
-  }
 
   # list paths of files to download
   file_url <- as.character(temp_meta$download_path2)
@@ -215,8 +174,7 @@ read_access <- function(city = NULL,
   if (is.null(aop_access)) { return(invisible(NULL)) }
 
   # peak Vs off-peak
-  if ((peak==FALSE & mode == 'car') |
-      (peak==FALSE & mode == 'public_transport' & cities_with_pt_check)) {
+  if (isFALSE(peak) && mode %in% c('car', 'public_transport')) {
                   aop_access <- subset(aop_access, peak == 0)
                 } else {
                   aop_access <- subset(aop_access, peak == 1)

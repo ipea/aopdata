@@ -53,7 +53,8 @@ read_something <- function(city = NULL, year = 2019, geometry = FALSE,
                            showProgress = TRUE) {
 
   # checks
-  abort_if_invalid(checkmate::check_logical(geometry), "geometry")
+  abort_if_invalid(checkmate::check_flag(geometry), "geometry")
+  abort_if_invalid(checkmate::check_flag(showProgress), "showProgress")
 
   # Get metadata with data url addresses
   temp_meta <- select_metadata(t = 'something', c = city, y = year)
@@ -79,9 +80,14 @@ read_something <- function(city = NULL, year = 2019, geometry = FALSE,
   `select_year_input()`, `select_mode_input()` in `R/utils.R` against the
   metadata, which is the source of truth for what exists. Other arguments use
   `abort_if_invalid(checkmate::check_*(...), "<arg>")` (`R/utils.R`), never
-  bare `checkmate::assert_*`. City input accepts names or 3-letter abbreviations,
-  case- and accent-insensitive (`tolower()` + `iconv(to = "ASCII//TRANSLIT")`),
-  and `"all"`.
+  bare `checkmate::assert_*`. City input is normalised only in
+  `select_city_input()`: names and 3-letter codes can be mixed, in any case,
+  with accents removed by a fixed `chartr()` map written as `\u` escapes (no
+  `iconv`, and no non-ASCII bytes in `R/`), plus `"all"`. Argument types
+  (`city`, `mode`) are checked in `select_metadata()` before any download;
+  flags use `check_flag()` at the top of each reader. Which cities have a mode
+  comes from the metadata (`select_mode_input()`), never from hard-coded
+  lists.
 - **Composition:** `read_access()` calls `read_landuse()`, which calls
   `read_population()`; `geometry = TRUE` adds `read_grid()`. A change in a
   lower reader changes every reader above it.
@@ -168,8 +174,8 @@ This is the package's most important invariant.
   duplicated in `vignettes/data_dic_en.Rmd` and `vignettes/data_dic_pt.Rmd`.
   The **city table** (name, abbreviation, modes) is repeated in four readers.
   Any change to a column, city, year or mode updates every copy (see
-  `summary-parity.md`), plus the public-transport city lists hardcoded per year
-  in `read_access()`.
+  `summary-parity.md`). The code takes city/year/mode availability from the
+  metadata, so only the docs need updating.
 - **Examples** download data, so they use
   `@examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true")` and
   `showProgress = FALSE`. Never `\dontrun{}` on an export.

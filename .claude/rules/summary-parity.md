@@ -27,8 +27,8 @@ changes and the summary isn't re-verified.
 
 **Duplicated facts (aopdata-specific drift magnets):** the city table (4
 readers), the data dictionary (`@details` of each reader +
-`data_dic_en.Rmd` + `data_dic_pt.Rmd`), the public-transport city lists per
-year (`read_access()` code + docs), and "years available" / "number of cities"
+`data_dic_en.Rmd` + `data_dic_pt.Rmd`), the public-transport cities per
+year in the docs, and "years available" / "number of cities"
 claims in the READMEs and `DESCRIPTION`. The hosted `metadata.csv` is the
 source of truth for what exists.
 

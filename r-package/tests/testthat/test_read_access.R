@@ -136,3 +136,11 @@ testthat::test_that("a failed nested download gives exactly one message", {
   )
   testthat::expect_null(out)
 })
+
+
+testthat::test_that("flags must be TRUE or FALSE", {
+  testthat::expect_error(read_access(city = 'nat', peak = NA), class = "aopdata_error")
+  testthat::expect_error(read_access(city = 'nat', showProgress = 1), class = "aopdata_error")
+  testthat::expect_error(read_population(city = 'nat', showProgress = 0), class = "aopdata_error")
+  testthat::expect_error(read_landuse(city = 'nat', geometry = NA), class = "aopdata_error")
+})

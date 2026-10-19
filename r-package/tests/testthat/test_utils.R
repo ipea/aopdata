@@ -308,3 +308,87 @@ testthat::test_that("download_metadata stops without the second source when inte
   testthat::expect_equal(calls, 1)
   testthat::expect_false(file.exists(cache$path))
 })
+
+
+### city, year and mode inputs (offline: fixture metadata) ----------------
+
+fixture_meta <- function() {
+  data.frame(
+    type = c(rep("access", 6), rep("grid", 3)),
+    city = c("nat", "nat", "poa", "poa", "spo", "spo", "nat", "poa", "spo"),
+    year = c(2019, 2019, 2019, 2019, 2017, 2017, NA, NA, NA),
+    mode = c("walk", "car", "walk", "public_transport", "walk",
+             "public_transport", NA, NA, NA),
+    download_path2 = paste0("u", 1:9),
+    name_muni = c("natal", "natal", "porto alegre", "porto alegre",
+                  "sao paulo", "sao paulo", "natal", "porto alegre",
+                  "sao paulo")
+  )
+}
+
+testthat::test_that("select_city_input accepts codes and names in any spelling", {
+  grid <- subset(fixture_meta(), type == "grid")
+  codes <- function(x) sort(select_city_input(grid, x)$city)
+
+  testthat::expect_equal(codes(c("nat", "Porto Alegre")), c("nat", "poa"))
+  testthat::expect_equal(codes("NAT"), "nat")
+  testthat::expect_equal(codes("ALL"), c("nat", "poa", "spo"))
+  testthat::expect_equal(codes(c("all", "xyz")), c("nat", "poa", "spo"))
+  testthat::expect_equal(codes("S\u00e3o Paulo"), "spo")
+  testthat::expect_equal(codes("S\u00c3O PAULO"), "spo")
+  testthat::expect_equal(codes("Sa\u0303o Paulo"), "spo")   # decomposed accent
+})
+
+testthat::test_that("select_city_input rejects unknown cities, naming them", {
+  grid <- subset(fixture_meta(), type == "grid")
+  testthat::expect_error(select_city_input(grid, "xyz"), "xyz", class = "aopdata_error")
+  testthat::expect_error(select_city_input(grid, c("nat", "xyz")), "xyz",
+                         class = "aopdata_error")
+  testthat::expect_error(select_city_input(grid, "{x}"), "{x}", fixed = TRUE,
+                         class = "aopdata_error")
+})
+
+testthat::test_that("select_metadata checks city and mode types before downloading", {
+  testthat::local_mocked_bindings(
+    download_metadata = function() stop("download_metadata should not be called")
+  )
+  for (bad in list(NULL, character(0), NA_character_, 1)) {
+    testthat::expect_error(select_metadata("grid", bad), class = "aopdata_error")
+  }
+  testthat::expect_error(select_metadata("access", "nat", 2019, NULL),
+                         class = "aopdata_error")
+  testthat::expect_error(select_metadata("access", "nat", 2019, c("walk", "car")),
+                         class = "aopdata_error")
+})
+
+testthat::test_that("select_metadata checks that every city has the mode", {
+  testthat::local_mocked_bindings(download_metadata = function() fixture_meta())
+
+  # public transport in 2019 only in poa
+  testthat::expect_error(select_metadata("access", c("nat", "poa"), 2019, "public_transport"),
+                         "nat", class = "aopdata_error")
+  testthat::expect_error(select_metadata("access", "nat", 2019, "public_transport"),
+                         "nat", class = "aopdata_error")
+  for (all in c("all", "ALL")) {
+    pt <- select_metadata("access", all, 2019, "public_transport")
+    testthat::expect_equal(unique(pt$city), "poa")
+  }
+
+  # names, and a mix of names and codes, are checked too
+  testthat::expect_error(select_metadata("access", c("Natal", "poa"), 2019, "public_transport"),
+                         "nat", class = "aopdata_error")
+
+  # 'all' wins over other elements
+  pt <- select_metadata("access", c("all", "xyz"), 2019, "public_transport")
+  testthat::expect_equal(unique(pt$city), "poa")
+
+  # a mode that doesn't exist, and no car at all in 2017
+  testthat::expect_error(select_metadata("access", "nat", 2019, "bike"),
+                         "bike", class = "aopdata_error")
+  testthat::expect_error(select_metadata("access", "all", 2017, "car"),
+                         class = "aopdata_error")
+
+  # a vector year
+  testthat::expect_error(select_metadata("access", "nat", c(2017, 2019), "walk"),
+                         class = "aopdata_error")
+})

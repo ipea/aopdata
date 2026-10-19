@@ -25,7 +25,7 @@ All must hold for the files touched:
 | Docs regenerated | `Rscript -e "devtools::document('r-package')"` then `git diff --stat r-package/man/ r-package/NAMESPACE` | No unexpected content drift (use `git diff`, not `git status`: `core.autocrlf=true` can make EOL-only noise); intended changes staged with the source |
 | Targeted tests | `Rscript -e "devtools::test('r-package', filter = '<fn>')"` for every touched function | 0 failures, 0 errors, 0 new warnings (needs internet) |
 | Offline behaviour | for any change to a reader or `utils.R` network code: the mocked-offline test for that path | Returns `NULL` with one message, no error |
-| Docs parity | if a column, city, year or mode changed | Every reader's `@details` table, `read_access()` PT city lists, `data_dic_en.Rmd` and `data_dic_pt.Rmd` agree |
+| Docs parity | if a column, city, year or mode changed | Every reader's `@details` table, `data_dic_en.Rmd` and `data_dic_pt.Rmd` agree with the metadata |
 | READMEs | if user-facing usage changed | Both `README.md` (root) and `r-package/README.md` updated where relevant |
 | NEWS | user-facing change | Bullet in `r-package/NEWS.md` under the right bold section |
 | Staging hygiene | `git diff --cached --name-only` | No `.rds`/`.RData`/`.Rhistory`/downloaded data; no workflow files except `CLAUDE.md` and `.claude/rules/` |

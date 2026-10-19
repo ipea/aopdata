@@ -10,63 +10,42 @@
 #'
 select_city_input <- function(temp_meta=temp_meta, city=NULL){
 
-  # cities available
-  cities_available <- paste(unique(temp_meta$name_muni),collapse = " | ")
-  error_msg <- "Data currently available only for the cities: {cities_available}."
+  # drop accents (written as escapes so the package code stays ASCII) and
+  # use lower case, so codes and names match in any spelling
+  from <- paste0("\u00e1\u00e0\u00e2\u00e3\u00e4\u00e9\u00e8\u00ea\u00eb",
+                 "\u00ed\u00ec\u00ee\u00ef\u00f3\u00f2\u00f4\u00f5\u00f6",
+                 "\u00fa\u00f9\u00fb\u00fc\u00e7\u00f1",
+                 "\u00c1\u00c0\u00c2\u00c3\u00c4\u00c9\u00c8\u00ca\u00cb",
+                 "\u00cd\u00cc\u00ce\u00cf\u00d3\u00d2\u00d4\u00d5\u00d6",
+                 "\u00da\u00d9\u00db\u00dc\u00c7\u00d1")
+  to <- strrep("aaaaaeeeeiiiiooooouuuucn", 2)
+  x <- tolower(chartr(from, to, enc2utf8(city)))
 
+  # decomposed accents (e.g. text pasted from macOS)
+  x <- gsub("[\u0300-\u036f]", "", x)
 
-  # NULL or numeric
-  if( !is.character(city) | any(nchar(city)<3) ){
+  # all cities
+  if (any(x == "all")) { return(temp_meta) }
+
+  # each element can be a 3-letter code or a city name
+  codes <- ifelse(x %in% temp_meta$city, x,
+                  temp_meta$city[match(x, temp_meta$name_muni)])
+
+  # invalid input
+  bad <- city[is.na(codes)]
+  if (length(bad) > 0) {
+    cities <- unique(temp_meta[, c("city", "name_muni")])
+    valid <- paste0(cities$city, " (", cities$name_muni, ")", collapse = ", ")
     cli::cli_abort(
-      message = error_msg,
+      c("Invalid {.arg city}: {.val {bad}}.",
+        "i" = "Use a city code or name: {valid}."),
       class = "aopdata_error",
       call = rlang::caller_env()
     )
   }
 
-  # 3 letter-abbreviation
-  if (all(nchar(city)==3)) {
-
-      # valid input 'all'
-      if (any(city =='all')) { return(temp_meta) }
-
-      # valid input
-      if (all(city %in% temp_meta$city)) { temp_meta <- temp_meta[ temp_meta$city %in% city, ]
-                                  return(temp_meta) }
-
-
-      # invalid input
-      else {
-        cli::cli_abort(
-          message = error_msg,
-          class = "aopdata_error",
-          call = rlang::caller_env()
-        )
-        }
-    }
-
-
-  # full name
-  if (all(nchar(city)>3)) {
-
-    city <- tolower(city)
-    # remove accents
-    city <- base::iconv(city, to="ASCII//TRANSLIT")
-
-    # valid input
-    if (all(city %in% temp_meta$name_muni)) { temp_meta <- temp_meta[ temp_meta$name_muni %in% city, ]
-                                        return(temp_meta)
-                                      }
-
-    # invalid input
-    else {
-      cli::cli_abort(
-        message = error_msg,
-        class = "aopdata_error",
-        call = rlang::caller_env()
-      )
-      }
-  }
+  temp_meta <- temp_meta[temp_meta$city %in% codes, ]
+  return(temp_meta)
 }
 
 
@@ -84,10 +63,7 @@ select_city_input <- function(temp_meta=temp_meta, city=NULL){
 #'
 select_year_input <- function(temp_meta=temp_meta, year=NULL){
 
-  abort_if_invalid(
-    checkmate::check_numeric(year, finite = TRUE, any.missing = FALSE),
-    "year"
-  )
+  abort_if_invalid(checkmate::check_number(year, finite = TRUE), "year")
 
   years_available <- paste(unique(temp_meta$year),collapse = " ")
 
@@ -115,34 +91,48 @@ select_year_input <- function(temp_meta=temp_meta, year=NULL){
 #'
 #' @param temp_meta A data.frame with the url addresses of aop datasets
 #' @param mode Transport mode (passed by read_ function)
+#' @param all_cities Logical. `TRUE` if the user asked for all cities.
+#' @param year_meta The metadata of the selected type and year, before the
+#'        city filter. Used to find the cities with this mode.
 #'
 #' @return A `data.frame` object with metadata subsetted by 'mode'
 #' @keywords internal
 #'
-select_mode_input <- function(temp_meta=temp_meta, mode=NULL){
+select_mode_input <- function(temp_meta=temp_meta, mode=NULL,
+                              all_cities = FALSE, year_meta = temp_meta){
 
-  abort_if_invalid(checkmate::check_string(mode, null.ok = FALSE), "mode")
+  # cities with this mode in the selected year
+  cities_with_mode <- unique(year_meta$city[year_meta$mode %in% mode])
 
-  # Valid input
-  if (mode %in% temp_meta$mode) {
-    temp_meta <- temp_meta[ temp_meta$mode %in% mode, ]
-    return(temp_meta)
-    }
+  # mode not available in this year
+  if (length(cities_with_mode) == 0) {
+    modes_available <- unique(year_meta$mode)
+    error_msg <- paste(
+      "{.arg mode} {.val {mode}} is not available in this year.",
+      "Please try another {.arg year} or one of the following modes:",
+      "{.val {modes_available}}."
+    )
+    cli::cli_abort(
+      message = error_msg,
+      class = "aopdata_error",
+      call = rlang::caller_env()
+    )
+  }
 
-  # invalid input
-  modes_available <- unique(temp_meta$mode)
-  error_msg <- paste(
-    "This {.arg mode} is not available for this {.arg city} and {.arg year}.",
-    "Please try another {.arg year} or one of the following modes:",
-    "{.val {modes_available}}."
-  )
-  # invalid input
-  cli::cli_abort(
-    message = error_msg,
-    class = "aopdata_error",
-    call = rlang::caller_env()
-  )
+  # mode not available for some of the requested cities
+  no_mode <- setdiff(unique(temp_meta$city), cities_with_mode)
+  if (!all_cities && length(no_mode) > 0) {
+    cli::cli_abort(
+      c(paste("{.arg mode} {.val {mode}} is not available for",
+              "{.val {no_mode}} in this year."),
+        "i" = "Cities with this mode: {.val {cities_with_mode}}."),
+      class = "aopdata_error",
+      call = rlang::caller_env()
+    )
+  }
 
+  temp_meta <- temp_meta[temp_meta$mode %in% mode, ]
+  return(temp_meta)
 }
 
 
@@ -163,7 +153,15 @@ select_mode_input <- function(temp_meta=temp_meta, mode=NULL){
 #'
 select_metadata <- function(t=NULL, c=NULL, y=NULL, m=NULL){
 
-# download metadata
+  # check input types before downloading anything
+  abort_if_invalid(
+    checkmate::check_character(c, min.len = 1, any.missing = FALSE),
+    "city"
+  )
+  if (t == 'access') { abort_if_invalid(checkmate::check_string(m), "mode") }
+  all_cities <- any(tolower(c) == "all")
+
+  # download metadata
   metadata <- as.data.frame(download_metadata())
 
   # check if download failed
@@ -172,17 +170,19 @@ select_metadata <- function(t=NULL, c=NULL, y=NULL, m=NULL){
   # Select data type
   temp_meta <- subset(metadata, type == t)
 
-  # Select city input
-  temp_meta <- select_city_input(temp_meta, city=c)
-
   # select year input
   if (t %in% c('access','land_use', 'population')) {
     temp_meta <- select_year_input(temp_meta, year=y)
   }
+  year_meta <- temp_meta
+
+  # Select city input
+  temp_meta <- select_city_input(temp_meta, city=c)
 
   # select mode input
   if (t=='access') {
-    temp_meta <- select_mode_input(temp_meta, mode=m)
+    temp_meta <- select_mode_input(temp_meta, mode=m, all_cities=all_cities,
+                                   year_meta=year_meta)
     }
 
   return(temp_meta)
@@ -332,8 +332,9 @@ classify_resp <- function(x) {
 #'
 #' @param urls Character. Urls of the files.
 #' @param paths Character. Where to save each file.
-#' @param progress Logical. Show a progress bar.
-#' @param label Character. Name of the progress bar.
+#' @param progress Logical. Show a progress bar: of downloaded data when
+#'        there is a single file, of the number of files otherwise.
+#' @param label Character. Name of the progress bar of files.
 #'
 #' @return A character vector with one status per file (see `classify_resp()`).
 #' @keywords internal
@@ -345,6 +346,11 @@ aop_fetch <- function(urls, paths, progress = FALSE,
 
   reqs <- lapply(urls, aop_request)
 
+  # progress bar: bytes for a single file, number of files otherwise
+  bytes_bar <- isTRUE(progress) && length(reqs) == 1
+  if (bytes_bar) { reqs[[1]] <- httr2::req_progress(reqs[[1]], type = "down") }
+  files_bar <- if (isTRUE(progress) && !bytes_bar) label else FALSE
+
   # after Ctrl+C, httr2 lets the active requests finish and says so
   # (not detected if cli.default_handler is set; then the mirror may be tried)
   interrupted <- FALSE
@@ -354,7 +360,7 @@ aop_fetch <- function(urls, paths, progress = FALSE,
         reqs,
         paths = paths,
         on_error = "continue",
-        progress = if (isTRUE(progress)) label else FALSE,
+        progress = files_bar,
         max_active = min(length(reqs), 10)
       ),
       message = function(m) {

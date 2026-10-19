@@ -11,9 +11,10 @@ aop_fetch(urls, paths, progress = FALSE, label = "Downloading files")
 
 \item{paths}{Character. Where to save each file.}
 
-\item{progress}{Logical. Show a progress bar.}
+\item{progress}{Logical. Show a progress bar: of downloaded data when
+there is a single file, of the number of files otherwise.}
 
-\item{label}{Character. Name of the progress bar.}
+\item{label}{Character. Name of the progress bar of files.}
 }
 \value{
 A character vector with one status per file (see \code{classify_resp()}).
