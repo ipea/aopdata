@@ -1,4 +1,4 @@
-# aopdata (development version)
+# aopdata v1.2.0
 
 **Major changes**
 

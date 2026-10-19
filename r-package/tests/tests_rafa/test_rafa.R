@@ -415,7 +415,7 @@ testthat::test_local()
 
 # LOCAL
 Sys.setenv(NOT_CRAN = "true")
-devtools::check(pkg = ".",  cran = FALSE, env_vars = c(NOT_CRAN = "true"))
+devtools::check(pkg = "./r-package/",  cran = FALSE, env_vars = c(NOT_CRAN = "true"))
 
 # CRAN
 Sys.setenv(NOT_CRAN = "false")
@@ -434,7 +434,7 @@ extrachecks::extrachecks()
 # usethis::use_cran_comments()
 
 
-devtools::submit_cran()
+devtools::submit_cran("./r-package/")
 
 
 # build binary -----------------
