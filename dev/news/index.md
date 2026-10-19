@@ -7,8 +7,9 @@
 - Data files are now downloaded with {httr2}. If a file can’t be
   downloaded from the Ipea server, that file is downloaded from the
   GitHub mirror, so a single unavailable file or server no longer makes
-  the whole request fail. The progress bar now counts files rather than
-  bytes.
+  the whole request fail. When several files are downloaded at once, the
+  progress bar counts files; when only one file is downloaded, it shows
+  the amount of data downloaded.
 - aopdata now requires R \>= 4.1.0 (a requirement of {httr2}).
 
 **Bug fixes**
@@ -18,12 +19,38 @@
   session cache: files are saved only once they are complete, and a
   cached file that can’t be read is removed.
 - Downloads that stall are now stopped instead of hanging the R session.
+- The metadata file is now downloaded with the same downloader as the
+  data files (GitHub release first, Ipea server as fallback), and cached
+  only once it has been read successfully. A broken cached metadata file
+  is downloaded again instead of making every later call in the session
+  fail.
 - When a download fails, the user now sees one message that says what
   failed. Previously the functions could print “No internet connection.”
   up to three times, even when only one file was unavailable.
 
 **Minor changes**
 
+- City codes and names can now be mixed, in any capitalisation and with
+  or without accents, in every function
+  (e.g. `city = c('nat', 'São Paulo')`). Previously a mix returned
+  `NULL` or a misleading error, and only
+  [`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md)
+  accepted upper-case city codes and `'ALL'`.
+- Invalid inputs now give a clear error before any data is downloaded:
+  `city` missing, `NULL`, `NA` or not text; an unknown city (the error
+  names it and lists the valid codes and names); and a `mode` that a
+  requested city doesn’t have (the error names the city and lists the
+  cities with that mode).
+- `peak`, `geometry` and `showProgress` must be a single `TRUE` or
+  `FALSE`. `showProgress = 1`/`0` is no longer accepted, and `NA` or
+  vectors give an error instead of a base R error. A vector `year` also
+  gives a clear error; one year per call is supported.
+- Which cities have public transport is now taken from the metadata
+  instead of lists hard-coded in
+  [`read_access()`](https://ipea.github.io/aopdata/dev/reference/read_access.md).
+- [`aopdata_dictionary()`](https://ipea.github.io/aopdata/dev/reference/aopdata_dictionary.md)
+  now only accepts `lang = "en"` or `"pt"`; values such as `"english"`
+  were accepted before and silently did nothing.
 - All messages and errors now use {cli}. Errors have the condition class
   `aopdata_error`, and messages about failed downloads have the class
   `aopdata_network`, so they can be caught with

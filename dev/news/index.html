@@ -50,15 +50,23 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="aopdata-development-version">aopdata (development version)<a class="anchor" aria-label="anchor" href="#aopdata-development-version"></a></h2>
 <p><strong>Major changes</strong></p>
-<ul><li>Data files are now downloaded with {httr2}. If a file can’t be downloaded from the Ipea server, that file is downloaded from the GitHub mirror, so a single unavailable file or server no longer makes the whole request fail. The progress bar now counts files rather than bytes.</li>
+<ul><li>Data files are now downloaded with {httr2}. If a file can’t be downloaded from the Ipea server, that file is downloaded from the GitHub mirror, so a single unavailable file or server no longer makes the whole request fail. When several files are downloaded at once, the progress bar counts files; when only one file is downloaded, it shows the amount of data downloaded.</li>
 <li>aopdata now requires R &gt;= 4.1.0 (a requirement of {httr2}).</li>
 </ul><p><strong>Bug fixes</strong></p>
 <ul><li>HTTP errors (e.g. 404 pages) are no longer saved and read as data.</li>
 <li>Interrupted or corrupted downloads are no longer reused from the session cache: files are saved only once they are complete, and a cached file that can’t be read is removed.</li>
 <li>Downloads that stall are now stopped instead of hanging the R session.</li>
+<li>The metadata file is now downloaded with the same downloader as the data files (GitHub release first, Ipea server as fallback), and cached only once it has been read successfully. A broken cached metadata file is downloaded again instead of making every later call in the session fail.</li>
 <li>When a download fails, the user now sees one message that says what failed. Previously the functions could print “No internet connection.” up to three times, even when only one file was unavailable.</li>
 </ul><p><strong>Minor changes</strong></p>
-<ul><li>All messages and errors now use {cli}. Errors have the condition class <code>aopdata_error</code>, and messages about failed downloads have the class <code>aopdata_network</code>, so they can be caught with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> or <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>. Download failure messages are now <code>rlang_message</code>s (previously <code>cliMessage</code>). The wording of the errors for invalid arguments, <code>mode</code> and <code>showProgress</code> changed, so match on the condition class rather than on the message text.</li>
+<ul><li>City codes and names can now be mixed, in any capitalisation and with or without accents, in every function (e.g. <code>city = c('nat', 'São Paulo')</code>). Previously a mix returned <code>NULL</code> or a misleading error, and only <code><a href="../reference/read_access.html">read_access()</a></code> accepted upper-case city codes and <code>'ALL'</code>.</li>
+<li>Invalid inputs now give a clear error before any data is downloaded: <code>city</code> missing, <code>NULL</code>, <code>NA</code> or not text; an unknown city (the error names it and lists the valid codes and names); and a <code>mode</code> that a requested city doesn’t have (the error names the city and lists the cities with that mode).</li>
+<li>
+<code>peak</code>, <code>geometry</code> and <code>showProgress</code> must be a single <code>TRUE</code> or <code>FALSE</code>. <code>showProgress = 1</code>/<code>0</code> is no longer accepted, and <code>NA</code> or vectors give an error instead of a base R error. A vector <code>year</code> also gives a clear error; one year per call is supported.</li>
+<li>Which cities have public transport is now taken from the metadata instead of lists hard-coded in <code><a href="../reference/read_access.html">read_access()</a></code>.</li>
+<li>
+<code><a href="../reference/aopdata_dictionary.html">aopdata_dictionary()</a></code> now only accepts <code>lang = "en"</code> or <code>"pt"</code>; values such as <code>"english"</code> were accepted before and silently did nothing.</li>
+<li>All messages and errors now use {cli}. Errors have the condition class <code>aopdata_error</code>, and messages about failed downloads have the class <code>aopdata_network</code>, so they can be caught with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> or <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>. Download failure messages are now <code>rlang_message</code>s (previously <code>cliMessage</code>). The wording of the errors for invalid arguments, <code>mode</code> and <code>showProgress</code> changed, so match on the condition class rather than on the message text.</li>
 <li>The “Downloading … data” messages are now only shown when <code>showProgress = TRUE</code>. The “Using mode” message was removed.</li>
 </ul></div>
     <div class="section level2">

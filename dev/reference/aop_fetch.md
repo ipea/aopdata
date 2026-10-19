@@ -20,11 +20,12 @@ aop_fetch(urls, paths, progress = FALSE, label = "Downloading files")
 
 - progress:
 
-  Logical. Show a progress bar.
+  Logical. Show a progress bar: of downloaded data when there is a
+  single file, of the number of files otherwise.
 
 - label:
 
-  Character. Name of the progress bar.
+  Character. Name of the progress bar of files.
 
 ## Value
 
