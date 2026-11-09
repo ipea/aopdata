@@ -2,6 +2,8 @@
 
 ## aopdata v1.2.0
 
+CRAN release: 2026-10-19
+
 **Major changes**
 
 - Data files are now downloaded with {httr2}. If a file can’t be
