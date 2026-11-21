@@ -38,7 +38,7 @@ testthat::test_that("download_data falls back to the mirror per file, keeping or
     }
   )
   urls <- paste0("https://www.ipea.gov.br/x/aoptest_", c("a", "b", "c"), ".csv")
-  dest <- file.path(tempdir(), basename(urls))
+  dest <- file.path(data_dir(), basename(urls))
   on.exit(unlink(dest), add = TRUE)
 
   out <- download_data(urls, progress_bar = FALSE)
@@ -58,7 +58,7 @@ testthat::test_that("download_data returns NULL and cleans up when both servers 
     }
   )
   url <- "https://www.ipea.gov.br/x/aoptest_bothfail.csv"
-  dest <- file.path(tempdir(), basename(url))
+  dest <- file.path(data_dir(), basename(url))
 
   testthat::expect_message(
     out <- download_data(url, progress_bar = FALSE),
@@ -66,7 +66,7 @@ testthat::test_that("download_data returns NULL and cleans up when both servers 
   )
   testthat::expect_null(out)
   testthat::expect_false(file.exists(dest))
-  testthat::expect_false(file.exists(paste0(dest, ".part")))
+  testthat::expect_length(list.files(dirname(dest), "aoptest_bothfail.*part$"), 0)
 })
 
 testthat::test_that("download_data reuses a complete cached file", {
@@ -74,11 +74,52 @@ testthat::test_that("download_data reuses a complete cached file", {
     aop_fetch = function(...) stop("aop_fetch should not be called")
   )
   url <- "https://www.ipea.gov.br/x/aoptest_cached.csv"
-  dest <- file.path(tempdir(), basename(url))
+  dest <- file.path(data_dir(), basename(url))
   write_fixture(dest)
   on.exit(unlink(dest), add = TRUE)
 
   testthat::expect_s3_class(download_data(url, progress_bar = FALSE), "data.frame")
+})
+
+testthat::test_that("download_data accepts a file another session saved first", {
+  url <- "https://www.ipea.gov.br/x/aoptest_race.csv"
+  dest <- file.path(data_dir(), basename(url))
+  on.exit(unlink(dest), add = TRUE)
+  testthat::local_mocked_bindings(
+    # the other session's file is saved; this session's part file is gone,
+    # so moving it fails
+    aop_fetch = function(urls, paths, progress = FALSE, label = NULL) {
+      write_fixture(dest)
+      "ok"
+    }
+  )
+  testthat::expect_equal(count_network_msgs(out <- download_data(url, FALSE)), 0)
+  testthat::expect_s3_class(out, "data.frame")
+  testthat::expect_length(list.files(dirname(dest), "aoptest_race.*part$"), 0)
+})
+
+testthat::test_that("download_data saves files in the cache folder of the release", {
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) { write_fixture(paths); "ok" }
+  )
+  url <- "https://www.ipea.gov.br/x/aoptest_release.csv"
+  dest <- file.path(get_aopdata_cache_dir(),
+                    paste0("aopdata_data_release_", data_release), basename(url))
+  on.exit(unlink(dest), add = TRUE)
+  download_data(url, progress_bar = FALSE)
+  testthat::expect_true(file.exists(dest))
+  testthat::expect_true(dest %in% list_aopdata_cache())
+})
+
+testthat::test_that("download_data fails gracefully if the cache can't be created", {
+  testthat::local_mocked_bindings(
+    data_dir = function() file.path(tempdir(), "aoptest_no_such_dir"),
+    aop_fetch = function(...) stop("aop_fetch should not be called")
+  )
+  testthat::expect_equal(
+    count_network_msgs(out <- download_data("https://x/aoptest_a.csv", FALSE)), 1
+  )
+  testthat::expect_null(out)
 })
 
 testthat::test_that("download_data stops without the mirror when interrupted", {
@@ -107,7 +148,7 @@ testthat::test_that("download_data removes a cached file that can't be read", {
     }
   )
   url <- "https://www.ipea.gov.br/x/aoptest_bad.gpkg"
-  dest <- file.path(tempdir(), basename(url))
+  dest <- file.path(data_dir(), basename(url))
   on.exit(unlink(dest), add = TRUE)
 
   testthat::expect_message(
@@ -178,17 +219,33 @@ testthat::test_that("aop_fetch reports an interrupted download as aborted", {
 
 ### download_metadata (offline: aop_fetch is mocked) ----------------
 
-# moves the session's cached metadata aside; restore() puts it back
+# moves the session's metadata and its copy in the cache aside; restore()
+# puts them back
 stash_metadata_cache <- function() {
-  tempf <- file.path(tempdir(), "metadata_aopdata.csv")
-  backup <- tempfile(fileext = ".csv")
-  had_cache <- file.exists(tempf)
-  if (had_cache) file.rename(tempf, backup)
+  files <- c(file.path(tempdir(), "metadata_aopdata.csv"), cached_metadata_file())
+  backup <- c(tempfile(fileext = ".csv"), tempfile(fileext = ".csv"))
+  had <- file.exists(files)
+  file.rename(files[had], backup[had])
   restore <- function() {
-    unlink(c(tempf, paste0(tempf, ".part")))
-    if (had_cache) file.rename(backup, tempf)
+    unlink(files)
+    unlink(list.files(dirname(files), "^metadata_aopdata.*part$",
+                      full.names = TRUE))
+    file.rename(backup[had], files[had])
   }
-  list(path = tempf, restore = restore)
+  list(path = files[1], cached = files[2], restore = restore)
+}
+
+# number of aopdata_cache messages signalled while evaluating expr
+count_cache_msgs <- function(expr) {
+  n <- 0
+  withCallingHandlers(
+    expr,
+    aopdata_cache = function(m) {
+      n <<- n + 1
+      invokeRestart("muffleMessage")
+    }
+  )
+  n
 }
 
 write_metadata_fixture <- function(path) {
@@ -265,6 +322,55 @@ testthat::test_that("download_metadata says when there is no internet", {
   testthat::local_mocked_bindings(has_internet = function() FALSE, .package = "curl")
   testthat::expect_equal(count_network_msgs(out <- download_metadata()), 1)
   testthat::expect_null(out)
+})
+
+testthat::test_that("download_metadata keeps a copy in the cache", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) { write_metadata_fixture(paths); "ok" }
+  )
+  download_metadata()
+  testthat::expect_equal(read_metadata(cache$cached)$city, "nat")
+})
+
+testthat::test_that("download_metadata works if the copy can't be saved", {
+  cache <- stash_metadata_cache()
+  on.exit(cache$restore(), add = TRUE)
+  testthat::local_mocked_bindings(
+    aop_fetch = function(urls, paths, ...) { write_metadata_fixture(paths); "ok" },
+    cached_metadata_file = function() file.path(tempdir(), "aoptest_no_dir", "m.csv")
+  )
+  testthat::expect_equal(count_network_msgs(meta <- download_metadata()), 0)
+  testthat::expect_equal(meta$city, "nat")
+})
+
+testthat::test_that("download_metadata uses the cached copy offline, once", {
+  # servers_down first: the has_internet() mock lasts until the end of the test
+  for (offline in c("servers_down", "no_internet")) {
+    cache <- stash_metadata_cache()
+    write_metadata_fixture(cache$cached)
+    if (offline == "no_internet") {
+      testthat::local_mocked_bindings(has_internet = function() FALSE,
+                                      .package = "curl")
+    }
+    testthat::local_mocked_bindings(
+      aop_fetch = function(urls, paths, ...) "conn_error"
+    )
+    n_net <- count_network_msgs(
+      n_cache <- count_cache_msgs(meta <- download_metadata())
+    )
+    testthat::expect_equal(c(n_net, n_cache), c(0, 1))
+    testthat::expect_equal(meta$city, "nat")
+
+    # later calls in the session use it silently
+    n_net <- count_network_msgs(
+      n_cache <- count_cache_msgs(meta <- download_metadata())
+    )
+    testthat::expect_equal(c(n_net, n_cache), c(0, 0))
+    testthat::expect_equal(meta$city, "nat")
+    cache$restore()
+  }
 })
 
 testthat::test_that("download_metadata stops without the second source when interrupted", {

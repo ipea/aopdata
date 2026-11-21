@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{download_data}
 \alias{download_data}
-\title{Download data to a temporary directory.}
+\title{Download data to the cache directory.}
 \usage{
 download_data(url, progress_bar)
 }
@@ -16,9 +16,10 @@ An \code{sf} or a \code{data.frame}, or \code{NULL} (with a message) if any file
 could not be downloaded or read.
 }
 \description{
-Downloads the requested files to a temporary directory (the
-session cache) and reads them. Each file is downloaded from
-the Ipea server first and, if that fails, from the GitHub
-release mirror.
+Downloads the requested files to the cache folder of the
+current data release (see \code{\link[=get_aopdata_cache_dir]{get_aopdata_cache_dir()}}) and reads
+them. Files already cached are not downloaded again. Each file
+is downloaded from the Ipea server first and, if that fails,
+from the GitHub release mirror.
 }
 \keyword{internal}

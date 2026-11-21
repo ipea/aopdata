@@ -191,12 +191,13 @@ select_metadata <- function(t=NULL, c=NULL, y=NULL, m=NULL){
 
 
 
-#' Download data to a temporary directory.
+#' Download data to the cache directory.
 #'
-#' @description Downloads the requested files to a temporary directory (the
-#'              session cache) and reads them. Each file is downloaded from
-#'              the Ipea server first and, if that fails, from the GitHub
-#'              release mirror.
+#' @description Downloads the requested files to the cache folder of the
+#'              current data release (see [get_aopdata_cache_dir()]) and reads
+#'              them. Files already cached are not downloaded again. Each file
+#'              is downloaded from the Ipea server first and, if that fails,
+#'              from the GitHub release mirror.
 #'
 #' @param url A string with the url address of aop dataset
 #' @param progress_bar Logical. Whether to display a progress bar.
@@ -215,14 +216,22 @@ download_data <- function(url, progress_bar){
     )
     }
 
-  # dest files in the session cache, and partial files while downloading
-  dest <- file.path(tempdir(), basename(url))
-  part <- paste0(dest, ".part")
+  # cache folder of the current data release
+  cache_dir <- data_dir()
+  if (!dir.exists(cache_dir)) {
+    inform_failure(paste("Could not create the cache directory", cache_dir))
+    return(invisible(NULL))
+  }
+
+  # dest files in the cache, and partial files of this session while
+  # downloading (sessions sharing the cache don't write the same file)
+  dest <- file.path(cache_dir, basename(url))
+  part <- paste0(dest, ".", Sys.getpid(), ".part")
   on.exit(unlink(part[file.exists(part)]), add = TRUE)
 
   # backup links
-  mirror <- paste0('https://github.com/ipea/aopdata/releases/download/v1.0.0/',
-                   basename(url))
+  mirror <- paste0('https://github.com/ipea/aopdata/releases/download/',
+                   data_release, '/', basename(url))
   sources <- list(url, mirror)
   labels <- c("Downloading files", "Downloading files (mirror)")
 
@@ -243,6 +252,10 @@ download_data <- function(url, progress_bar){
     # move complete downloads into the cache
     done <- pending & status == "ok"
     moved <- suppressWarnings(file.rename(part[done], dest[done]))
+
+    # another session may have saved the same file first (on Windows, the
+    # rename fails while that file is open)
+    moved <- moved | (file.exists(dest[done]) & file.size(dest[done]) > 0)
     status[done] <- ifelse(moved, "ok", "http_error")
   }
 
@@ -382,11 +395,11 @@ aop_fetch <- function(urls, paths, progress = FALSE,
 
 
 
-#' Load data from tempdir to global environment
+#' Load data from the cache
 #'
-#' @description Reads data from tempdir to global environment.
+#' @description Reads cached data files.
 #'
-#' @param temps The paths of one or more data files stored in tempdir, all
+#' @param temps The paths of one or more cached data files, all
 #'        `.csv` or all `.gpkg`.
 #'
 #' @return Returns either an `sf` or a `data.frame`, depending of the data set
@@ -577,4 +590,18 @@ abort_if_invalid <- function(check, arg, call = rlang::caller_env()) {
 #'
 inform_failure <- function(msg) {
   cli::cli_inform(c("x" = "{msg}"), class = "aopdata_network")
+}
+
+
+
+
+#' Inform the user about the cache
+#'
+#' @param msg The message text.
+#'
+#' @return Signals a message of class `aopdata_cache`.
+#' @keywords internal
+#'
+inform_cache <- function(msg) {
+  cli::cli_inform(c("i" = "{msg}"), class = "aopdata_cache")
 }
