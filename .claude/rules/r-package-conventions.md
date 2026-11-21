@@ -114,16 +114,24 @@ This is the package's most important invariant.
   `download_metadata()` uses `aop_fetch()` too (GitHub first, then Ipea) and
   caches `metadata.csv` only after `read_metadata()` validates it.
   `check_connection()` (curl) is used only by `aopdata_dictionary()`.
-- **Mirrors:** `metadata.csv` comes from the GitHub release `v1.0.0` first and
+- **Mirrors:** `metadata.csv` comes from the GitHub release `data_release`
+  (`R/aopdata.R`, currently `v1.0.0`) first and
   the Ipea server (`www.ipea.gov.br/geobr/aopdata/`) as fallback. Data files
   come from the Ipea URL in `metadata$download_path2` first, with the GitHub
   release `v1.0.0` as fallback. Keep both mirrors working; never hardcode a
   single server.
-- **Cache:** downloads go to `tempdir()` only (session cache). Files are
-  written to `<file>.part` and renamed only when complete; a cached file that
-  can't be read is deleted. No `resume`.
-  Nothing is written outside `tempdir()`. **[NEW]** a persistent cache
-  (`tools::R_user_dir()`) would be a user-facing change and needs a plan.
+- **Cache (`R/cache.R`):** downloads go to a persistent cache,
+  `get_aopdata_cache_dir()` (default `tools::R_user_dir("aopdata", "cache")`;
+  `set_aopdata_cache_dir(path)` or `options(aopdata.cache_dir)` put it in an
+  `aopdata` folder inside `path`), in `aopdata_data_release_<data_release>`
+  (`data_dir()`). Old release folders are deleted once per session
+  (`delete_old_releases()`, opt-out `aopdata.keep_old_cache`). Files are
+  written to `<file>.<pid>.part` and renamed only when complete; a cached file
+  that can't be read is deleted. No `resume`. The session copy of
+  `metadata.csv` stays in `tempdir()`; a copy in the cache is used only when
+  it can't be downloaded (`inform_cache()`, class `aopdata_cache`).
+  **Maintainer rule:** Ipea URLs are not versioned, so any change to the
+  hosted files requires bumping `data_release` (and the GitHub release tag).
 - Network code is wrapped in `# nocov start` / `# nocov end` or `# nocov`.
 
 ## A4. data.table and sf
@@ -201,13 +209,17 @@ This is the package's most important invariant.
     `paths` and returns statuses) and expect `NULL` plus an
     `aopdata_network` message. Mocking `check_connection` no longer reaches
     `download_data()`. Fixture files use fake basenames (`aoptest_*`) so they
-    can't poison the shared `tempdir()` cache. Needs testthat ≥ 3.1.7.
+    can't poison the shared cache. Needs testthat ≥ 3.1.7.
+  - `setup-cache.R` points `tools::R_user_dir()` to `tempdir()` (via
+    `R_USER_CACHE_DIR` / `R_USER_CONFIG_DIR`); tests never touch the real
+    user cache or config.
 - Real-network tests also need `testthat::skip_if_offline()` when added.
 - `tests/tests_rafa/` is the maintainer's scratch; leave it alone.
 
 ## A9. NEWS.md
 
-Version headers are `# aopdata vX.Y.Z`. Sections are bold lines, not `##`:
+Version headers are `# aopdata vX.Y.Z`; unreleased changes go under
+`# aopdata (development version)` until the maintainer sets the version. Sections are bold lines, not `##`:
 `**Major changes**`, `**Minor changes**`, `**Bug fixes**` (add
 `**New features**` only if needed). Bullets are plain sentences; packages as
 `{pkg}`, functions in backticks.
@@ -243,7 +255,7 @@ Version headers are `# aopdata vX.Y.Z`. Sections are bold lines, not `##`:
 | Red flag | Do instead |
 |---|---|
 | `library()`/`require()` in `R/` | `pkg::fun()` |
-| Writing outside `tempdir()` | Write only to `tempdir()` or user-supplied paths |
+| Writing outside `tempdir()` and the cache | Write only to `tempdir()`, `get_aopdata_cache_dir()` or user-supplied paths; examples/tests never write the real cache |
 | `stop()` / uncaught error on a network failure | `inform_failure()` + `return(invisible(NULL))` |
 | Reader result used without `is.null()` check | `check_downloaded_obj()` + early return |
 | A single hardcoded server URL | Ipea + GitHub-release mirrors (A3) |
@@ -263,7 +275,7 @@ Version headers are `# aopdata vX.Y.Z`. Sections are bold lines, not `##`:
 [ ] pkg::fun() everywhere (except the @importFrom set / ggplot2 in docs)
 [ ] reader follows the A2 skeleton; NULL propagates at every call site
 [ ] no error on network failure; one informative cli message; tested offline with a mock
-[ ] downloads only to tempdir(); both mirrors still used
+[ ] downloads only to the cache (data_dir()); both mirrors still used
 [ ] user-supplied objects never modified by reference
 [ ] cli::cli_* for new messages
 [ ] roxygen: templates, @family, @return, @examplesIf NOT_CRAN
