@@ -1,3 +1,11 @@
+# aopdata (development version)
+
+**Major changes**
+
+- Downloaded files are now cached in a directory that persists across R sessions (by default given by `tools::R_user_dir()`), so each file is downloaded only once. Previously files were cached in `tempdir()` and downloaded again in every session. The cache is versioned by data release: files from previous data releases are deleted automatically the first time data is downloaded in a session (set `options(aopdata.keep_old_cache = TRUE)` to keep them). A file replaced on the server without a new data release is not downloaded again.
+- New functions to manage the cache: `set_aopdata_cache_dir()` (caches files in an `aopdata` folder inside a directory of your choice, kept across sessions), `get_aopdata_cache_dir()`, `list_aopdata_cache()` and `delete_aopdata_cache()`. Set `options(aopdata.cache_dir = "<path>")` to use another cache directory in the current session only, e.g. `options(aopdata.cache_dir = tempdir())`.
+- Cached data can now be read offline: a copy of the metadata is kept in the cache and used for the rest of the session when the metadata can't be downloaded. Messages about the cache have the condition class `aopdata_cache`.
+
 # aopdata v1.2.0
 
 **Major changes**

@@ -128,6 +128,24 @@ h3_for <- read_grid(city = 'Fortaleza')
 
 ```
 
+### Cache
+
+Downloaded files are saved in a cache directory that persists across R sessions, so each file is downloaded only once. The cache is versioned by data release: files from previous releases are deleted automatically.
+
+```
+# where files are cached
+get_aopdata_cache_dir()
+
+# list cached files
+list_aopdata_cache()
+
+# cache in an 'aopdata' folder inside another directory (kept across sessions)
+set_aopdata_cache_dir("path/to/dir")
+
+# delete the cache
+delete_aopdata_cache()
+```
+
 ### Note
 In all of the functions above, note that:
 

@@ -15,7 +15,9 @@ Downloads \code{metadata.csv} from the GitHub release or, if that
 fails, from the Ipea server, and caches it in \code{tempdir()} for
 the session. A file is cached only once it has been read
 successfully; a cached file that can't be read is downloaded
-again.
+again. A copy is also kept in the cache directory; when the
+metadata can't be downloaded, that copy is used for the rest
+of the session.
 }
 \examples{
 \dontrun{ if (interactive()) {

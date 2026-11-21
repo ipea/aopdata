@@ -10,3 +10,8 @@ count_network_msgs <- function(expr) {
   )
   n
 }
+
+# forget that old data releases were already checked in this session
+reset_cache_state <- function() {
+  aopdata_env$old_cache_checked <- NULL
+}

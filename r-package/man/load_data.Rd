@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{load_data}
 \alias{load_data}
-\title{Load data from tempdir to global environment}
+\title{Load data from the cache}
 \usage{
 load_data(temps)
 }
 \arguments{
-\item{temps}{The paths of one or more data files stored in tempdir, all
+\item{temps}{The paths of one or more cached data files, all
 \code{.csv} or all \code{.gpkg}.}
 }
 \value{
@@ -15,6 +15,6 @@ Returns either an \code{sf} or a \code{data.frame}, depending of the data set
 that was downloaded
 }
 \description{
-Reads data from tempdir to global environment.
+Reads cached data files.
 }
 \keyword{internal}

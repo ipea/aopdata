@@ -25,3 +25,11 @@
 if(getRversion() >= "2.15.1") utils::globalVariables(
   c('geometry', 'i.geom', 'id_hex', 'type', '.', ':='))
 
+
+
+# tag of the data release on GitHub; it also names the cache folder, so any
+# change to the hosted files requires a new tag
+data_release <- "v1.0.0"
+
+# session state (e.g. whether old data releases were already deleted)
+aopdata_env <- new.env(parent = emptyenv())
